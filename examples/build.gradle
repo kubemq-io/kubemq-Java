@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+}
+
+group 'tradency.com'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile project(':kubemq-java-sdk')
+}
+
+apply plugin: 'idea'
+
+
+task("eventChannel", dependsOn: 'classes', type: JavaExec) {
+    main = 'com.tradency.kubemq.sdk.examples.eventchannel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("eventSender", dependsOn: 'classes', type: JavaExec) {
+    main = 'com.tradency.kubemq.sdk.examples.eventsender.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("eventSubscriber", dependsOn: 'classes', type: JavaExec) {
+    main = 'com.tradency.kubemq.sdk.examples.eventsubscriber.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("commandQueryChannel", dependsOn: 'classes', type: JavaExec) {
+    main = 'com.tradency.kubemq.sdk.examples.commandquerychannel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("commandQueryInitiator", dependsOn: 'classes', type: JavaExec) {
+    main = 'com.tradency.kubemq.sdk.examples.commandqueryinitiator.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("commandQueryResponder", dependsOn: 'classes', type: JavaExec) {
+    main = 'com.tradency.kubemq.sdk.examples.commandqueryresponder.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
