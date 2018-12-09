@@ -1,5 +1,5 @@
 syntax = "proto3";
-option java_package = "com.tradency.kubemq.sdk.grpc";
+option java_package = "io.kubemq.sdk.grpc";
 option java_outer_classname = "Kubemq";
 package kubemq;
 service kubemq {

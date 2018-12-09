@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group 'tradency.com'
+group 'kubemq.io'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -22,31 +22,31 @@ apply plugin: 'idea'
 
 
 task("eventChannel", dependsOn: 'classes', type: JavaExec) {
-    main = 'com.tradency.kubemq.sdk.examples.eventchannel.Program'
+    main = 'io.kubemq.sdk.examples.eventchannel.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 task("eventSender", dependsOn: 'classes', type: JavaExec) {
-    main = 'com.tradency.kubemq.sdk.examples.eventsender.Program'
+    main = 'io.kubemq.sdk.examples.eventsender.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 task("eventSubscriber", dependsOn: 'classes', type: JavaExec) {
-    main = 'com.tradency.kubemq.sdk.examples.eventsubscriber.Program'
+    main = 'io.kubemq.sdk.examples.eventsubscriber.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 task("commandQueryChannel", dependsOn: 'classes', type: JavaExec) {
-    main = 'com.tradency.kubemq.sdk.examples.commandquerychannel.Program'
+    main = 'io.kubemq.sdk.examples.commandquerychannel.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 task("commandQueryInitiator", dependsOn: 'classes', type: JavaExec) {
-    main = 'com.tradency.kubemq.sdk.examples.commandqueryinitiator.Program'
+    main = 'io.kubemq.sdk.examples.commandqueryinitiator.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 task("commandQueryResponder", dependsOn: 'classes', type: JavaExec) {
-    main = 'com.tradency.kubemq.sdk.examples.commandqueryresponder.Program'
+    main = 'io.kubemq.sdk.examples.commandqueryresponder.Program'
     classpath = sourceSets.main.runtimeClasspath
 }

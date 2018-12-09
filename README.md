@@ -14,7 +14,7 @@ The recommended way to use the SDK for Java in your project is to consume it fro
 
 ```
 <dependency>
-  <groupId>com.tradency</groupId>
+  <groupId>io.kubemq</groupId>
   <artifactId>kubemq-java-sdk-bom</artifactId>
   <version>1.0.1</version>
   <type>pom</type>
@@ -25,7 +25,7 @@ The recommended way to use the SDK for Java in your project is to consume it fro
 To build with Gradle, add the dependency below to your build.gradle file.
 
 ```
-compile group: 'com.tradency.kubemq.sdk', name: 'kubemq-java-sdk', version: '1.0.1'
+compile group: 'io.kubemq.sdk', name: 'kubemq-java-sdk', version: '1.0.1'
 ```
 
 ## Generating Documentation
@@ -38,7 +38,7 @@ Javadoc is used for documentation. You can generate HTML locally with the follow
 
 ## Running the examples
 
-The [examples](https://github.com/tradency/kubemq-sdk-java/tree/v1.0.1/examples) 
+The [examples](https://github.com/kubemq-io/Java_SDK/tree/v1.0.1/examples) 
 are standalone projects that showcase the usage of the SDK.
 
 To run the examples you need to have a running instance of KubeMQ. 
