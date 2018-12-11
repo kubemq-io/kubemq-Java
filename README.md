@@ -43,8 +43,7 @@ The only required configuration setting is the KubeMQ server address.
 Configuration can be set by using one of the following:
 - Environment Variable
 - `appsettings.json` file
-- `app.Config` or `Web.config` file
-- Within the code
+- 'Java Property' 
 
 
 ### Configuration via Environment Variable
@@ -52,36 +51,12 @@ Set `KubeMQServerAddress` to the KubeMQ Server Address
 
 
 ### Configuration via appsettings.json
-Simply add the following to your appsettings.json:
-```JSON
-{
-  "KubeMQ": {
-    "serverAddress": "{YourServerAddress}:{YourServerPort}"
-  }
-}
-```
-
-
-### Configuration via app.Config
-Simply add the following to your app.config:
-```xml
-<configuration>  
-   <configSections>  
-    <section name="KubeMQ" type="System.Configuration.NameValueSectionHandler"/>      
-  </configSections>  
-    
-  <KubeMQ>  
-    <add key="serverAddress" value="{YourServerAddress}:{YourServerPort}"/>
-  </KubeMQ>  
-</configuration>
-```
-
+by passing the -DKubeMQServerAddress= option to the JVM)
+Within the code
 
 ### Configuration via code
 When setting the KubeMQ server address within the code, simply pass the address as a parameter to the various constructors.
 See exactly how in the code examples in this document.
-
-
 
 ## Generating Documentation
 
