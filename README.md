@@ -42,7 +42,6 @@ The only required configuration setting is the KubeMQ server address.
 
 Configuration can be set by using one of the following:
 - Environment Variable
-- `appsettings.json` file
 - 'Java Property' 
 
 
