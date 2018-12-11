@@ -1,8 +1,17 @@
 # KubeMQ SDK for Java
 
-The **KubeMQ SDK for Java** enables Java developers to easily work with [KubeMQ](https://kubemq.io/). 
+The **KubeMQ SDK for Java** enables Java developers to easily work with [KubeMQ](https://kubemq.io/) server. 
 
-## Getting Started
+# What is KubeMQ:
+KubeMQ is a Cloud Native message broker for distributed services architecture, delivered as a single Kubernetes service.
+Easily connects to services and clients, allowing high-scale and high-availability cluster, low-latency and secured implementation of Commands, Events and persistence queue patterns.
+
+# General SDK description
+The SDK implements all communication patterns available through the KubeMQ server:
+- Events
+- EventStore
+- Command
+- Query
 
 ### Prerequisites
 
@@ -27,6 +36,52 @@ To build with Gradle, add the dependency below to your build.gradle file.
 ```
 compile group: 'io.kubemq.sdk', name: 'kubemq-java-sdk', version: '1.0.1'
 ```
+
+# Configurations
+The only required configuration setting is the KubeMQ server address.
+
+Configuration can be set by using one of the following:
+- Environment Variable
+- `appsettings.json` file
+- `app.Config` or `Web.config` file
+- Within the code
+
+
+### Configuration via Environment Variable
+Set `KubeMQServerAddress` to the KubeMQ Server Address
+
+
+### Configuration via appsettings.json
+Simply add the following to your appsettings.json:
+```JSON
+{
+  "KubeMQ": {
+    "serverAddress": "{YourServerAddress}:{YourServerPort}"
+  }
+}
+```
+
+
+### Configuration via app.Config
+Simply add the following to your app.config:
+```xml
+<configuration>  
+   <configSections>  
+    <section name="KubeMQ" type="System.Configuration.NameValueSectionHandler"/>      
+  </configSections>  
+    
+  <KubeMQ>  
+    <add key="serverAddress" value="{YourServerAddress}:{YourServerPort}"/>
+  </KubeMQ>  
+</configuration>
+```
+
+
+### Configuration via code
+When setting the KubeMQ server address within the code, simply pass the address as a parameter to the various constructors.
+See exactly how in the code examples in this document.
+
+
 
 ## Generating Documentation
 
