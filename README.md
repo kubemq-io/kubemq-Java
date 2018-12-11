@@ -50,7 +50,7 @@ Configuration can be set by using one of the following:
 Set `KubeMQServerAddress` to the KubeMQ Server Address
 
 
-### Configuration via appsettings.json
+### Configuration via Java Property
 by passing the -DKubeMQServerAddress= option to the JVM)
 Within the code
 
