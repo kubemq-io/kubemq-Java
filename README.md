@@ -75,12 +75,13 @@ To run the examples you need to have a running instance of KubeMQ.
 You can use the Gradle tasks to run the examples:
 
 ```
-.gradlew eventChannel
-.gradlew eventSender
-.gradlew eventSubscriber
 .gradlew commandQueryChannel
 .gradlew commandQueryInitiator
 .gradlew commandQueryResponder
+.gradlew commandQueryResponderAsync
+.gradlew eventChannel
+.gradlew eventSender
+.gradlew eventSubscriber
 ```
 
 ## Building from source

@@ -21,21 +21,6 @@ dependencies {
 apply plugin: 'idea'
 
 
-task("eventChannel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.eventchannel.Program'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task("eventSender", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.eventsender.Program'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task("eventSubscriber", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.eventsubscriber.Program'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
 task("commandQueryChannel", dependsOn: 'classes', type: JavaExec) {
     main = 'io.kubemq.sdk.examples.commandquerychannel.Program'
     classpath = sourceSets.main.runtimeClasspath
@@ -48,5 +33,25 @@ task("commandQueryInitiator", dependsOn: 'classes', type: JavaExec) {
 
 task("commandQueryResponder", dependsOn: 'classes', type: JavaExec) {
     main = 'io.kubemq.sdk.examples.commandqueryresponder.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("commandQueryResponderAsync", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.commandqueryresponderasync.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("eventChannel", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.eventchannel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("eventSender", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.eventsender.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("eventSubscriber", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.eventsubscriber.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
