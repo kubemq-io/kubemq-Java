@@ -96,7 +96,6 @@ public class Sender extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
      * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
      */
-    // todo fix implementation like the c# one
     public StreamObserver<Event> StreamEvent(final StreamObserver<Result> messageDeliveryReportStreamObserver) throws ServerAddressNotSuppliedException, SSLException {
         StreamObserver<Kubemq.Event> streamObserver = GetKubeMQAsyncClient().sendEventsStream(new StreamObserver<Kubemq.Result>() {
             @Override
@@ -125,8 +124,10 @@ public class Sender extends GrpcClient {
 
         return new StreamObserver<Event>() {
             @Override
-            public void onNext(Event value) {
-                streamObserver.onNext(value.ToInnerEvent());
+            public void onNext(Event notification) {
+                if (notification.isReturnResult()) {
+                    streamObserver.onNext(notification.ToInnerEvent());
+                }
             }
 
             @Override

@@ -38,7 +38,7 @@ import java.util.Random;
 
 public class BaseExample {
 
-    private Logger logger;
+    protected Logger logger;
     private String channelName;
     private String clientID;
     private int timeout;

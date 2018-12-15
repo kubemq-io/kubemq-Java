@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Event {
 
     private static AtomicInteger _id = new AtomicInteger(0);
-    public boolean returnResult;
+    private boolean returnResult;
     /**
      * Represents The channel name to send to using the KubeMQ
      */
