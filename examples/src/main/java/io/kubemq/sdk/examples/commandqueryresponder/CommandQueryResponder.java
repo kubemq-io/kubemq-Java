@@ -32,6 +32,7 @@ import io.kubemq.sdk.subscription.SubscribeType;
 
 import javax.net.ssl.SSLException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 
 class CommandQueryResponder extends BaseExample {
 
@@ -41,18 +42,21 @@ class CommandQueryResponder extends BaseExample {
     CommandQueryResponder() throws ServerAddressNotSuppliedException, SSLException {
         super("CommandQueryResponder");
         responder = new Responder();
-        // todo fix example - reimplement as in the C#
-        HandleIncomingRequests = requestReceive -> {
-            System.out.println(MessageFormat.format(
+        HandleIncomingRequests = request -> {
+            this.logger.warn(MessageFormat.format(
                     "Subscriber Received Event: Metadata:''{0}'', Channel:''{1}''",
-                    requestReceive.getMetadata(),
-                    requestReceive.getChannel()
+                    request.getMetadata(),
+                    request.getChannel()
             ));
 
-            Response response = new Response(requestReceive);
+            Response response = new Response(request);
+            response.setCacheHit(false);
+            response.setError("None");
+            response.setClientID(this.getClientID());
             response.setBody("OK".getBytes());
-            response.setMetadata("Received Request");
-            response.setClientID("Response Return");
+            response.setExecuted(true);
+            response.setMetadata("OK");
+            response.setTimestamp(LocalDateTime.now());
             return response;
         };
         CreateSubscribeToQueries();
