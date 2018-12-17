@@ -28,6 +28,7 @@ import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.tools.Converter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 public class Response {
@@ -76,6 +77,7 @@ public class Response {
     public Response(RequestReceive request) {
         requestID = request.getRequestId();
         replyChannel = request.getReplyChannel();
+        setTimestamp(LocalDateTime.now(ZoneOffset.UTC));
     }
 
     public Response(Kubemq.Response inner) {
