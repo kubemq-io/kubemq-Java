@@ -23,9 +23,12 @@
  */
 package io.kubemq.sdk.Queue;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Dictionary;
 
 import io.kubemq.sdk.grpc.Kubemq.QueueMessagesBatchResponse;
+import io.kubemq.sdk.grpc.Kubemq.SendQueueMessageResult;
 
 public class SendBatchMessageResult {
 
@@ -42,6 +45,14 @@ public class SendBatchMessageResult {
     public Boolean getHaveErrors(){
         return this.queueMessagesBatchResponse.getHaveErrors();
     }
+
+	public Iterable<SendMessageResult> getResults() {
+        Collection<SendMessageResult> batch = new ArrayList<SendMessageResult>();
+        for (SendQueueMessageResult var :  this.queueMessagesBatchResponse.getResultsList()) {
+            batch.add(new SendMessageResult(var));            
+        }
+        return batch;       
+	}
     
 
 

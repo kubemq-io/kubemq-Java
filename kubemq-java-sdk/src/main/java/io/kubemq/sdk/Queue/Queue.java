@@ -69,7 +69,15 @@ public class Queue extends GrpcClient {
         this.Ping();
     }
 
-     /// <summary>
+     public Queue(String queueName, String clientID, String kubeMQAddress)
+            throws SSLException, ServerAddressNotSuppliedException {
+        this.queueName = queueName;
+        this.clientID = clientID;
+        this._kubemqAddress = kubeMQAddress;       
+        this.Ping();
+	}
+
+		/// <summary>
         /// Send single message
         /// </summary>
         /// <param name="message"></param>
@@ -120,13 +128,17 @@ public class Queue extends GrpcClient {
         /// <returns></returns>
   
 
-		public ReceiveMessagesResponse ReceiveQueueMessages(Integer maxNumberOfMessagesQueueMessages )
+		public ReceiveMessagesResponse ReceiveQueueMessages(Integer maxNumberOfMessagesQueueMessages, Integer  waitTimeSecondsQueueMessages)
             throws SSLException, ServerAddressNotSuppliedException
         {
 
            if (maxNumberOfMessagesQueueMessages==null){
             maxNumberOfMessagesQueueMessages = this.maxNumberOfMessagesQueueMessages;
            }
+           if (waitTimeSecondsQueueMessages==null){
+            waitTimeSecondsQueueMessages = this.waitTimeSecondsQueueMessages;
+           }
+
                 Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient().receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder()
                 .setRequestID(IDGenerator.Getid())
                 .setClientID(this.clientID)
@@ -144,17 +156,20 @@ public class Queue extends GrpcClient {
         /// </summary>
         /// <param name="maxNumberOfMessagesQueueMessages">number of returned messages, default is 32 </param>
         /// <returns></returns>
-        public ReceiveMessagesResponse PeakQueueMessage(Integer maxNumberOfMessagesQueueMessages)
+        public ReceiveMessagesResponse PeekQueueMessage(Integer maxNumberOfMessagesQueueMessages,Integer  waitTimeSecondsQueueMessages)
             throws SSLException, ServerAddressNotSuppliedException {
             if (maxNumberOfMessagesQueueMessages==null){
                 maxNumberOfMessagesQueueMessages = this.maxNumberOfMessagesQueueMessages;
+               }
+               if (waitTimeSecondsQueueMessages==null){
+                waitTimeSecondsQueueMessages = this.waitTimeSecondsQueueMessages;
                }
                     Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient().receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder()
                     .setRequestID(IDGenerator.Getid())
                     .setClientID(this.clientID)
                     .setChannel(this.queueName)
                     .setMaxNumberOfMessages(maxNumberOfMessagesQueueMessages)
-                    .setWaitTimeSeconds(this.waitTimeSecondsQueueMessages)
+                    .setWaitTimeSeconds(waitTimeSecondsQueueMessages)
                     .setIsPeak(true)
                     .build()                
                     );

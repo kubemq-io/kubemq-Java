@@ -145,4 +145,24 @@ if(this.tags!=null){
 }
 return x;
 }
+
+public Message setExpiration(int expiration) {
+  this.policy.newBuilderForType().setExpirationSeconds(expiration).build();
+  return this;
+}
+
+public Message setDelay(int delay) {
+  this.policy.newBuilderForType().setDelaySeconds(delay).build();
+  return this;
+}
+
+public Message setMaxReciveCount(int maxReciveCount) {
+  this.policy.newBuilderForType().setMaxReceiveCount(maxReciveCount).build();
+  return this;
+}
+
+public Message setMaxReciveQueue(String maxReciveQueue) {
+  this.policy.newBuilderForType().setMaxReceiveQueue(maxReciveQueue).build();
+  return this;
+}
 }

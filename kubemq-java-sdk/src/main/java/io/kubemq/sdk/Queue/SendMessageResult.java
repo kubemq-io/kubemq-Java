@@ -47,7 +47,7 @@ public class SendMessageResult {
       return this.sendQueueMessageResult.getExpirationAt();
     }
   
-    public Long SentAt(){
+    public Long getSentAt(){
       return this.sendQueueMessageResult.getSentAt();
     }
   
