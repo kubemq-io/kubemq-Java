@@ -58,7 +58,7 @@ public class Program {
             
             Message msg = new Message()
             .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
-            .setMetadata("empty")
+            .setMetadata("empty");
             SendMessageResult res=  queue.SendQueueMessage(msg);
           if(res.getIsError()  )       {
             System.out.println("message enqueue error, error:{res.Error}");

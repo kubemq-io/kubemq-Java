@@ -30,7 +30,7 @@ import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
-import io.kubemq.sdk.examples.SiteDocUseCases.var;
+
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesRequest;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse;
@@ -89,11 +89,27 @@ public class Transaction extends GrpcClient {
     private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr) throws SSLException, ServerAddressNotSuppliedException{
         
         
-        StreamObserver<StreamQueueMessagesRequest> ret = GetKubeMQAsyncClient().streamQueueMessage(null);
+        StreamObserver<StreamQueueMessagesRequest> ret = GetKubeMQAsyncClient().streamQueueMessage(new StreamObserver<Kubemq.StreamQueueMessagesRequest>() {
+
+                    @Override
+                    public void onNext(StreamQueueMessagesRequest value) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+        });
 
        
         
-       // streamObserver.onNext(sr);
+        ret.onNext(sr);
      
   
         

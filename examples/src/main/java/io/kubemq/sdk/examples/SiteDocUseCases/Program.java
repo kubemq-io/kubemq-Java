@@ -60,7 +60,14 @@ public class Program {
 
     }
 
-    private static void Transactional_Queue_Extend_Visibility() throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
+    private static void Transactional_Queue_Resend_Modified_Message() {
+    }
+
+    private static void Transactional_Queue_Resend_to_New_Queue() {
+    }
+
+    private static void Transactional_Queue_Extend_Visibility()
+            throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         Transaction tran = queue.CreateTransaction();
        TransactionMessagesResponse resRec= tran.Receive(10, 10);
@@ -76,7 +83,8 @@ public class Program {
             throws ServerAddressNotSuppliedException, InterruptedException, ClassNotFoundException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         Transaction tran = queue.CreateTransaction();
-       TransactionMessagesResponse resRec= tran.Receive(10, 10);
+    
+        TransactionMessagesResponse resRec= tran.Receive(10, 10);
        if (resRec.getIsError()){
            System.out.printf("Message dequeue error, error:%s",resRec.getError());
             return;  
@@ -103,7 +111,7 @@ public class Program {
 
     }
 
-    private static void Peek_Messages_from_a_Queue() throws SSLException, ServerAddressNotSuppliedException {
+    private static void Peek_Messages_from_a_Queue() throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         ReceiveMessagesResponse resPek = queue.PeekQueueMessage(10, 1);
         if (resPek.getIsError()){

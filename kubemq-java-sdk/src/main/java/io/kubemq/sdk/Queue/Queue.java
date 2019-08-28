@@ -25,7 +25,7 @@ package io.kubemq.sdk.Queue;
 
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
-import io.kubemq.sdk.examples.SiteDocUseCases.Transaction;
+
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.kubemq.sdk.grpc.Kubemq.QueueMessage;

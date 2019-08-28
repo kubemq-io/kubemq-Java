@@ -133,11 +133,6 @@ public class Converter {
             return cltn;
 }
 
-	public static Map<String, String> CreateTags(Dictionary<String, String> tags) {
-        Map<String, String> keyValuePairs = new  Map<String, String>
-        for (type var : tags) {
-            
-        }
-	}
+	
 
 }

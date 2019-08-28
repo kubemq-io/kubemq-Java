@@ -60,7 +60,7 @@ public class Message {
       * @param messageID Unique for message
       * @param tags Dictionary of string , string pair:A set of Key value pair that help categorize the message.
       */
-    public Message(byte[] body, String metadata, String messageID, Dictionary<String,String> tags) {
+    public Message(byte[] body, String metadata, String messageID, Map<String, String> tags) {
     this.body = body;
     this.metadata = metadata;
     this.tags = tags;
@@ -116,7 +116,7 @@ public Message setClientID(String clientID) {
   return this;
 }
 
-public  Dictionary<String, String> getTags() {
+public Map<String,String> getTags() {
 	return this.tags;
 }
 
