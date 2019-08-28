@@ -15,6 +15,9 @@ import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
+import io.grpc.stub.StreamObserver;
+import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesRequest;
+
 /**
  */
 @javax.annotation.Generated(
@@ -705,9 +708,9 @@ public final class kubemqGrpc {
     /**
      */
     public io.grpc.stub.StreamObserver<io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesRequest> streamQueueMessage(
-        io.grpc.stub.StreamObserver<io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse> responseObserver) {
+        StreamObserver<StreamQueueMessagesRequest> streamObserver) {
       return asyncBidiStreamingCall(
-          getChannel().newCall(getStreamQueueMessageMethod(), getCallOptions()), responseObserver);
+          getChannel().newCall(getStreamQueueMessageMethod(), getCallOptions()), streamObserver);
     }
 
     /**

@@ -36,12 +36,14 @@ import io.kubemq.sdk.Queue.Queue;
 import io.kubemq.sdk.Queue.ReceiveMessagesResponse;
 import io.kubemq.sdk.Queue.SendBatchMessageResult;
 import io.kubemq.sdk.Queue.SendMessageResult;
+import io.kubemq.sdk.Queue.Transaction;
+import io.kubemq.sdk.Queue.TransactionMessagesResponse;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.tools.Converter;
 
 public class Program {
 
-    public static void main(String[] args) throws ServerAddressNotSuppliedException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws ServerAddressNotSuppliedException, IOException, ClassNotFoundException, InterruptedException {
         
         Ack_All_Messages_In_a_Queue();
         Send_Message_to_a_Queue();
@@ -51,6 +53,53 @@ public class Program {
         Send_Batch_Messages();
         Receive_Messages_from_a_Queue();
         Peek_Messages_from_a_Queue();
+        Transactional_Queue_Ack();
+        Transactional_Queue_Extend_Visibility();
+        Transactional_Queue_Resend_to_New_Queue();
+        Transactional_Queue_Resend_Modified_Message();
+
+    }
+
+    private static void Transactional_Queue_Extend_Visibility() throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        Transaction tran = queue.CreateTransaction();
+       TransactionMessagesResponse resRec= tran.Receive(10, 10);
+       if (resRec.getIsError()){
+           System.out.printf("Message dequeue error, error:%s",resRec.getError());
+            return;  
+       }
+       System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));         
+     
+    }
+
+    private static void Transactional_Queue_Ack()
+            throws ServerAddressNotSuppliedException, InterruptedException, ClassNotFoundException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        Transaction tran = queue.CreateTransaction();
+       TransactionMessagesResponse resRec= tran.Receive(10, 10);
+       if (resRec.getIsError()){
+           System.out.printf("Message dequeue error, error:%s",resRec.getError());
+            return;  
+       }
+       System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));         
+       System.out.println("Doing some work.....");
+       
+       Thread.sleep(1000);
+       System.out.println("Done, ack the message");
+        TransactionMessagesResponse resAck = tran
+                .AckMessage(resRec.getMessage().getQueueMessageAttributes().getSequence());
+       if (resAck.getIsError())
+       {
+        System.out.printf("Ack message error:%s",resAck.getError());
+       }
+
+    //    System.out.println("Checking for next message");
+    //    resRec = transaction.Receive(10, 1);
+    //    if (resRec.IsError)
+    //    {
+    //        Console.WriteLine($"Message dequeue error, error:{resRec.Error}");
+    //        return;
+    //    }
 
     }
 

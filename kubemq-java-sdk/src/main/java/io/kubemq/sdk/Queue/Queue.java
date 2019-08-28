@@ -25,6 +25,7 @@ package io.kubemq.sdk.Queue;
 
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
+import io.kubemq.sdk.examples.SiteDocUseCases.Transaction;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.kubemq.sdk.grpc.Kubemq.QueueMessage;
@@ -45,6 +46,7 @@ public class Queue extends GrpcClient {
     private String clientID;
     private int maxNumberOfMessagesQueueMessages = 32;
     private int waitTimeSecondsQueueMessages =1;
+    private Transaction transaction;
     private static Logger logger = LoggerFactory.getLogger(Queue.class);
   
    
@@ -217,5 +219,12 @@ public class Queue extends GrpcClient {
     public void WaitTimeSecondsQueueMessages(int waitTimeSecondsQueueMessages) {
         this.waitTimeSecondsQueueMessages = waitTimeSecondsQueueMessages;
     }
+
+	public Transaction CreateTransaction() throws ServerAddressNotSuppliedException {
+	        if (transaction == null) {
+            transaction = new Transaction(this);
+        }
+        return transaction;
+	}
 
 }

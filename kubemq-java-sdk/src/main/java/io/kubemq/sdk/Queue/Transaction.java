@@ -30,15 +30,17 @@ import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
+import io.kubemq.sdk.examples.SiteDocUseCases.var;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesRequest;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse;
 import io.kubemq.sdk.tools.IDGenerator;
 import io.kubemq.sdk.grpc.kubemqGrpc;
 
-class Transaction extends GrpcClient {
+public class Transaction extends GrpcClient {
 
     private Queue queue;
+    protected StreamQueueMessagesResponse msg;
 
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
         this.queue = queue;
@@ -59,36 +61,48 @@ class Transaction extends GrpcClient {
         .setWaitTimeSeconds(waitTimeSeconds)
         .build());
 
+       
         return new TransactionMessagesResponse(resp);
 
     }
+
+    public TransactionMessagesResponse AckMessage(long sequence)
+            throws SSLException, ServerAddressNotSuppliedException {
+        if(!OpenStream())     {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
+        }
+        Kubemq.StreamQueueMessagesResponse  resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
+        .setClientID(this.queue.getClientID())
+        .setChannel(this.queue.getQueueName())
+        .setRequestID(IDGenerator.Getid())
+        .setStreamRequestTypeData(Kubemq.StreamRequestType.AckMessage)   
+        .setRefSequence(sequence)   
+        .build());
+
+        return new TransactionMessagesResponse(resp);
+	}
 
     private boolean OpenStream() {
       return true;
     }
 
     private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr) throws SSLException, ServerAddressNotSuppliedException{
-        StreamObserver<Kubemq.StreamQueueMessagesRequest> streamObserver = GetKubeMQAsyncClient().streamQueueMessage(new StreamObserver<Kubemq.StreamQueueMessagesResponse>() {
+        
+        
+        StreamObserver<StreamQueueMessagesRequest> ret = GetKubeMQAsyncClient().streamQueueMessage(null);
 
-                    @Override
-                    public void onNext(StreamQueueMessagesResponse value) {
-                       
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-
-                    }
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-                }
-        );
-        streamObserver.onNext(sr);
-        return null;
+       
+        
+       // streamObserver.onNext(sr);
+     
+  
+        
+        return msg;
     }
+
+	
+
+	
 
    
     
