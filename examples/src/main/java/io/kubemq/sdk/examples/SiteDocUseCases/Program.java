@@ -45,23 +45,29 @@ public class Program {
 
     public static void main(String[] args) throws ServerAddressNotSuppliedException, IOException, ClassNotFoundException, InterruptedException {
         
-        // Ack_All_Messages_In_a_Queue();
+        Ack_All_Messages_In_a_Queue();
         Send_Message_to_a_Queue();
-        // Send_Message_to_a_Queue_with_Expiration();
-        // Send_Message_to_a_Queue_with_Delay();
-        // Send_Message_to_a_Queue_with_Deadletter_Queue();
-        // Send_Batch_Messages();
-        // Receive_Messages_from_a_Queue();
-        // Peek_Messages_from_a_Queue();
-      //  Transactional_Queue_Ack();
-      //  Transactional_Queue_Reject();
-        //Transactional_Queue_Extend_Visibility();
+        Send_Message_to_a_Queue_with_Expiration();
+        Send_Message_to_a_Queue_with_Delay();
+        Send_Message_to_a_Queue_with_Deadletter_Queue();
+        Send_Batch_Messages();
+        Receive_Messages_from_a_Queue();
+        Peek_Messages_from_a_Queue();
+        Transactional_Queue_Ack();
+        Transactional_Queue_Reject();
+        Transactional_Queue_Extend_Visibility();
         Transactional_Queue_Resend_to_New_Queue();
-        // Transactional_Queue_Resend_Modified_Message();
+        Transactional_Queue_Resend_Modified_Message();
+
+        Receiving_Events();
 
     }
 
-    private static void Transactional_Queue_Reject() throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
+    private static void Receiving_Events() {
+    }
+
+    private static void Transactional_Queue_Reject()
+            throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         Transaction tran = queue.CreateTransaction();
        TransactionMessagesResponse resRec= tran.Receive(10, 10);
@@ -79,11 +85,27 @@ public class Program {
    
     }
 
-    private static void Transactional_Queue_Resend_Modified_Message() {
-
+    private static void Transactional_Queue_Resend_Modified_Message() throws ClassNotFoundException, IOException, ServerAddressNotSuppliedException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        Transaction tran = queue.CreateTransaction();
+       TransactionMessagesResponse resRec= tran.Receive(500, 10);
+       if (resRec.getIsError()){
+           System.out.printf("Message dequeue error, error:%s",resRec.getError());
+            return;  
+       }
+       System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));   
+       TransactionMessagesResponse resMod= tran.Modify(resRec.getMessage()
+       .setQueue("receiverB")
+       .setMetadata("new meatdata")
+       );
+       if (resMod.getIsError()){
+           System.out.printf("Message Modify error, error::%s",resMod.getError());
+            return;  
+       }
     }
 
-    private static void Transactional_Queue_Resend_to_New_Queue() {
+    private static void Transactional_Queue_Resend_to_New_Queue()
+            throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         Transaction tran = queue.CreateTransaction();
        TransactionMessagesResponse resRec= tran.Receive(5, 10);

@@ -55,6 +55,30 @@ public class Transaction extends GrpcClient {
         this.queue = queue;
         this._kubemqAddress=queue.getServerAddress();
     }
+
+    public TransactionMessagesResponse Modify(Message setMetadata)
+            throws SSLException, ServerAddressNotSuppliedException {
+        if(!OpenStream())     {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
+        }
+        Kubemq.StreamQueueMessagesResponse resp;
+        try {
+            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
+                    .setClientID(this.queue.getClientID())                   
+                    .setRequestID(IDGenerator.Getid())
+                    .setStreamRequestTypeData(Kubemq.StreamRequestType.SendModifiedMessage)
+                    .setModifiedMessage(setMetadata.toQueueMessage())
+                    .build());
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
+       
+        return new TransactionMessagesResponse(resp);
+	}
+
 	public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
             throws SSLException, ServerAddressNotSuppliedException {
         if(!OpenStream())     {
@@ -159,7 +183,6 @@ public class Transaction extends GrpcClient {
     private Boolean bool = true;
     private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr) throws SSLException, ServerAddressNotSuppliedException, InterruptedException {
      
-           
          if (reqStreamObserver == null){
         reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(resp);
          }
