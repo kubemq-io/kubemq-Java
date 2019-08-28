@@ -68,7 +68,13 @@ public class Message {
 
     public Message(Kubemq.QueueMessage queueMessage)
     {
-     
+     this.attributes = queueMessage.getAttributes();
+     this.policy = queueMessage.getPolicy();
+     this.clientID = queueMessage.getClientID();
+     this.metadata = queueMessage.getMetadata();
+     this.body =  queueMessage.getBody().toByteArray();
+     this.tags = queueMessage.getTagsMap();
+     this.queueName = queueMessage.getChannel();
     }
    
     public Message() {      
@@ -131,7 +137,7 @@ public Message setPolicy(Kubemq.QueueMessagePolicy queueMessagePolicy) {
 
 protected QueueMessage toQueueMessage() {
 Kubemq.QueueMessage x =  Kubemq.QueueMessage.newBuilder()
-.setMessageID(this.messageID)
+.setMessageID(this.messageID==null ? IDGenerator.Getid() : this.getMessageID())
 .setClientID(this.clientID)
 .setChannel(this.queueName)
 .setBody(ByteString.copyFrom(this.body))
