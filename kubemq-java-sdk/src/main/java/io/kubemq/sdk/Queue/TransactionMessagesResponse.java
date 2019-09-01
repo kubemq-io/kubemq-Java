@@ -37,7 +37,7 @@ public class TransactionMessagesResponse {
         this.streamQueueMessagesResponse=   Kubemq.StreamQueueMessagesResponse.newBuilder()
         .setIsError(true)     
         .setError(errorMessage)
-        .setRequestID(requestID)
+        .setRequestID(requestID != null ? requestID: "")
         .build();
         this.message = msg;
     }
