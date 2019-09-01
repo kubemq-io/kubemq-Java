@@ -25,11 +25,13 @@ package io.kubemq.sdk.examples.SiteDocUseCases;
 
 import java.awt.List;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.net.ssl.SSLException;
 
+import io.grpc.stub.StreamObserver;
 import io.kubemq.sdk.Queue.AckAllMessagesResponse;
 import io.kubemq.sdk.Queue.Message;
 import io.kubemq.sdk.Queue.Queue;
@@ -39,32 +41,207 @@ import io.kubemq.sdk.Queue.SendMessageResult;
 import io.kubemq.sdk.Queue.Transaction;
 import io.kubemq.sdk.Queue.TransactionMessagesResponse;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
+import io.kubemq.sdk.commandquery.Request;
+import io.kubemq.sdk.commandquery.RequestType;
+import io.kubemq.sdk.commandquery.Responder;
+import io.kubemq.sdk.commandquery.Response;
+import io.kubemq.sdk.event.Event;
+import io.kubemq.sdk.event.EventReceive;
+import io.kubemq.sdk.event.Result;
+import io.kubemq.sdk.event.Subscriber;
+import io.kubemq.sdk.subscription.EventsStoreType;
+import io.kubemq.sdk.subscription.SubscribeRequest;
+import io.kubemq.sdk.subscription.SubscribeType;
 import io.kubemq.sdk.tools.Converter;
 
 public class Program {
-
+  
     public static void main(String[] args) throws ServerAddressNotSuppliedException, IOException, ClassNotFoundException, InterruptedException {
         
-        Ack_All_Messages_In_a_Queue();
-        Send_Message_to_a_Queue();
-        Send_Message_to_a_Queue_with_Expiration();
-        Send_Message_to_a_Queue_with_Delay();
-        Send_Message_to_a_Queue_with_Deadletter_Queue();
-        Send_Batch_Messages();
-        Receive_Messages_from_a_Queue();
-        Peek_Messages_from_a_Queue();
-        Transactional_Queue_Ack();
-        Transactional_Queue_Reject();
-        Transactional_Queue_Extend_Visibility();
-        Transactional_Queue_Resend_to_New_Queue();
-        Transactional_Queue_Resend_Modified_Message();
+        // Ack_All_Messages_In_a_Queue();
+        // Send_Message_to_a_Queue();
+        // Send_Message_to_a_Queue_with_Expiration();
+        // Send_Message_to_a_Queue_with_Delay();
+        // Send_Message_to_a_Queue_with_Deadletter_Queue();
+        // Send_Batch_Messages();
+        // Receive_Messages_from_a_Queue();
+        // Peek_Messages_from_a_Queue();
+        // Transactional_Queue_Ack();
+        // Transactional_Queue_Reject();
+        // Transactional_Queue_Extend_Visibility();
+        // Transactional_Queue_Resend_to_New_Queue();
+        // Transactional_Queue_Resend_Modified_Message();
 
-        Receiving_Events();
+       
+        // Receiving_Events();     
+        // //Sending_Events_Single_Event();
+        // Sending_Events_Stream_Events();
+     
+        // Receiving_Events_Store();
+        // Sending_Events_Store_Single_Event_to_Store();
+        // Sending_Events_Store_Stream_Events_Store();
+
+        // Commands_Receiving_Commands_Requests();
+        // Commands_Sending_Command_Request();
+        // Commands_Sending_Command_Request_async();
+
+        Queries_Receiving_Query_Requests();
+        Queries_Sending_Query_Request();
+        Queries_Sending_Query_Request_async();
+        try {
+            int read = System.in.read();
+        } catch (IOException e) {
+            System.out.println("Error:  I/O error occurred.");
+        }
 
     }
 
-    private static void Receiving_Events() {
+
+    private static void Send_Message_to_a_Queue() throws ServerAddressNotSuppliedException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        SendMessageResult resSend = queue.SendQueueMessage(new Message()
+        .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
+        .setMetadata("someMeta")
+        );           
+        if (resSend.getIsError())
+        {
+            System.out.printf("Message enqueue error, error:%s",resSend.getError());
+        }
     }
+
+    private static void Send_Message_to_a_Queue_with_Expiration()
+    throws ServerAddressNotSuppliedException, IOException {
+Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+SendMessageResult resSend = queue.SendQueueMessage(new Message()
+.setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
+.setMetadata("someMeta")
+.setExpiration(5)
+);           
+if (resSend.getIsError())
+{
+    System.out.printf("Message enqueue error, error:%s",resSend.getError());
+}
+}
+
+private static void Send_Message_to_a_Queue_with_Delay() throws ServerAddressNotSuppliedException, IOException {
+    Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+    SendMessageResult resSend = queue.SendQueueMessage(new Message()
+    .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
+    .setMetadata("someMeta")
+    .setDelay(3)
+    );           
+    if (resSend.getIsError())
+    {
+        System.out.printf("Message enqueue error, error:%s",resSend.getError());
+    }
+}
+
+private static void Send_Message_to_a_Queue_with_Deadletter_Queue()
+throws ServerAddressNotSuppliedException, IOException {
+Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+SendMessageResult resSend = queue.SendQueueMessage(new Message()
+.setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
+.setMetadata("someMeta")
+.setMaxReciveCount(3)
+.setMaxReciveQueue("DeadLetterQueue")
+);           
+if (resSend.getIsError())
+{
+    System.out.printf("Message enqueue error, error:%s",resSend.getError());
+}
+}
+
+
+
+    private static void Send_Batch_Messages() throws ServerAddressNotSuppliedException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        Collection<Message> batch = new ArrayList<Message>(); 
+
+        for (int i = 0; i < 10; i++) {
+            batch.add(new Message()
+            .setBody(Converter.ToByteArray("Batch Message "+i)));
+        }
+        
+        SendBatchMessageResult resBatch = queue.SendQueueMessagesBatch(batch);
+        if (resBatch.getHaveErrors())
+        {
+            System.out.print("Message sent batch has errors");
+        }
+        for (SendMessageResult resSend : resBatch.getResults()) {
+            if( resSend.getIsError()){
+                System.out.printf("Message enqueue error, error:%s",resSend.getError());
+            }else {
+                System.out.printf("Send to Queue Result: MessageID:%d, {}, Sent At:%t",resSend.getMessageID(),Converter.FromUnixTime(resSend.getSentAt()));
+
+            }
+            
+        }       
+    }
+
+    private static void Receive_Messages_from_a_Queue()
+            throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        ReceiveMessagesResponse resRec = queue.ReceiveQueueMessages(10, 1);
+        if (resRec.getIsError()){
+            System.out.printf("Message dequeue error, error:%s",resRec.getError());
+            return;   
+        }
+        System.out.printf("Received %s Messages:",resRec.getMessagesReceived());
+        for (Message msg : resRec.getMessages()) {
+            System.out.printf("MessageID: %d, Body:%s",msg.getMessageID(),Converter.FromByteArray(msg.getBody()));         
+        }
+    }
+
+    private static void Peek_Messages_from_a_Queue() throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        ReceiveMessagesResponse resPek = queue.PeekQueueMessage(10, 1);
+        if (resPek.getIsError()){
+            System.out.printf("Message dequeue error, error:%s",resPek.getError());
+            return;   
+        }
+        System.out.printf("Received %s Messages:",resPek.getMessagesReceived());
+        for (Message msg : resPek.getMessages()) {
+            System.out.printf("MessageID: %d, Body:%s",msg.getMessageID(),Converter.FromByteArray(msg.getBody()));         
+        }
+    }
+
+
+
+    private static void Ack_All_Messages_In_a_Queue() throws SSLException, ServerAddressNotSuppliedException {
+
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        AckAllMessagesResponse resAck = queue.AckAllQueueMessages();
+        if (resAck.getIsError())
+        {
+            System.out.printf("AckAllQueueMessagesResponse error, error:%s",resAck.getError());
+                   return;
+        }
+        System.out.printf("Ack All Messages:%d completed",resAck.getAffectedMessages());
+
+    }
+    private static void Transactional_Queue_Ack()
+            throws ServerAddressNotSuppliedException, InterruptedException, ClassNotFoundException, IOException {
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        Transaction tran = queue.CreateTransaction();
+    
+        TransactionMessagesResponse resRec= tran.Receive(10, 10);
+       if (resRec.getIsError()){
+           System.out.printf("Message dequeue error, error:%s",resRec.getError());
+            return;  
+       }
+       System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));         
+       System.out.println("Doing some work.....");
+       
+       Thread.sleep(1000);
+       System.out.println("Done, ack the message");
+        TransactionMessagesResponse resAck = tran.AckMessage();
+       if (resAck.getIsError())
+       {
+        System.out.printf("Ack message error:%s",resAck.getError());
+       }
+
+    }
+
 
     private static void Transactional_Queue_Reject()
             throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
@@ -83,6 +260,36 @@ public class Program {
          return;  
     }
    
+    }
+
+    private static void Transactional_Queue_Extend_Visibility()
+    throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException, InterruptedException {
+Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+Transaction tran = queue.CreateTransaction();
+TransactionMessagesResponse resRec= tran.Receive(5, 10);
+if (resRec.getIsError()){
+   System.out.printf("Message dequeue error, error:%s",resRec.getError());
+    return;  
+}
+System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));   
+System.out.println("work for 1 seconds");
+Thread.sleep(1000);
+System.out.println("Need more time to process, extend visibility for more 3 seconds");
+TransactionMessagesResponse resExt = tran.ExtendVisibility(3);
+if (resExt.getIsError()){
+System.out.printf("Message dequeue error, error:%s",resExt.getError());
+ return;  
+}
+System.out.println("Approved. work for 2.5 seconds");   
+Thread.sleep(2500);
+System.out.println("Work done... ack the message");
+TransactionMessagesResponse resAck = tran.AckMessage();
+if (resAck.getIsError())
+{
+System.out.printf("Ack message error:%s",resAck.getError());
+
+}
+System.out.println("Ack done");
     }
 
     private static void Transactional_Queue_Resend_Modified_Message() throws ClassNotFoundException, IOException, ServerAddressNotSuppliedException {
@@ -125,183 +332,377 @@ public class Program {
      
         }
 
-    private static void Transactional_Queue_Extend_Visibility()
-            throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException, InterruptedException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        Transaction tran = queue.CreateTransaction();
-       TransactionMessagesResponse resRec= tran.Receive(5, 10);
-       if (resRec.getIsError()){
-           System.out.printf("Message dequeue error, error:%s",resRec.getError());
-            return;  
-       }
-       System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));   
-       System.out.println("work for 1 seconds");
-       Thread.sleep(1000);
-       System.out.println("Need more time to process, extend visibility for more 3 seconds");
-       TransactionMessagesResponse resExt = tran.ExtendVisibility(3);
-       if (resExt.getIsError()){
-        System.out.printf("Message dequeue error, error:%s",resExt.getError());
-         return;  
-    }
-    System.out.println("Approved. work for 2.5 seconds");   
-    Thread.sleep(2500);
-    System.out.println("Work done... ack the message");
-    TransactionMessagesResponse resAck = tran.AckMessage();
-    if (resAck.getIsError())
-    {
-     System.out.printf("Ack message error:%s",resAck.getError());
+  
 
-    }
-    System.out.println("Ack done");
-}
 
-    private static void Transactional_Queue_Ack()
-            throws ServerAddressNotSuppliedException, InterruptedException, ClassNotFoundException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        Transaction tran = queue.CreateTransaction();
-    
-        TransactionMessagesResponse resRec= tran.Receive(10, 10);
-       if (resRec.getIsError()){
-           System.out.printf("Message dequeue error, error:%s",resRec.getError());
-            return;  
-       }
-       System.out.printf("MessageID: %d, Body:%s",resRec.getMessage().getMessageID(),Converter.FromByteArray(resRec.getMessage().getBody()));         
-       System.out.println("Doing some work.....");
-       
-       Thread.sleep(1000);
-       System.out.println("Done, ack the message");
-        TransactionMessagesResponse resAck = tran.AckMessage();
-       if (resAck.getIsError())
-       {
-        System.out.printf("Ack message error:%s",resAck.getError());
-       }
 
-    //    System.out.println("Checking for next message");
-    //    resRec = transaction.Receive(10, 1);
-    //    if (resRec.IsError)
-    //    {
-    //        Console.WriteLine($"Message dequeue error, error:{resRec.Error}");
-    //        return;
-    //    }
+ 
 
-    }
-
-    private static void Peek_Messages_from_a_Queue() throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        ReceiveMessagesResponse resPek = queue.PeekQueueMessage(10, 1);
-        if (resPek.getIsError()){
-            System.out.printf("Message dequeue error, error:%s",resPek.getError());
-            return;   
-        }
-        System.out.printf("Received %s Messages:",resPek.getMessagesReceived());
-        for (Message msg : resPek.getMessages()) {
-            System.out.printf("MessageID: %d, Body:%s",msg.getMessageID(),Converter.FromByteArray(msg.getBody()));         
-        }
-    }
-
-    private static void Receive_Messages_from_a_Queue()
-            throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        ReceiveMessagesResponse resRec = queue.ReceiveQueueMessages(10, 1);
-        if (resRec.getIsError()){
-            System.out.printf("Message dequeue error, error:%s",resRec.getError());
-            return;   
-        }
-        System.out.printf("Received %s Messages:",resRec.getMessagesReceived());
-        for (Message msg : resRec.getMessages()) {
-            System.out.printf("MessageID: %d, Body:%s",msg.getMessageID(),Converter.FromByteArray(msg.getBody()));         
-        }
-    }
-
-    private static void Send_Batch_Messages() throws ServerAddressNotSuppliedException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        Collection<Message> batch = new ArrayList<Message>(); 
-
-        for (int i = 0; i < 10; i++) {
-            batch.add(new Message()
-            .setBody(Converter.ToByteArray("Batch Message "+i)));
+    private static void Queries_Sending_Query_Request_async() throws IOException, ServerAddressNotSuppliedException {
+        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+        io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
+        channelParameters.setChannelName(ChannelName);
+        channelParameters.setClientID(ClientID);
+        channelParameters.setKubeMQAddress(KubeMQServerAddress);
+        channelParameters.setRequestType(RequestType.Query);
+        channelParameters.setTimeout(1000);
+        io.kubemq.sdk.commandquery.Channel channel = new io.kubemq.sdk.commandquery.Channel(channelParameters);
+        Request request = new Request();
+        request.setBody(Converter.ToByteArray("hello kubemq - sending a query, please reply"));
+        StreamObserver<Response> response = new StreamObserver<Response>(){
+        
+            @Override
+            public void onNext(Response value) {
+                if (!value.isExecuted()){  
+            
+                    System.out.printf("Response error:{}",value.getError());
+                    System.out.printf("Response Received:{}, ExecutedAt {}",value.getRequestID(), value.getTimestamp());
+            }
+          
         }
         
-        SendBatchMessageResult resBatch = queue.SendQueueMessagesBatch(batch);
-        if (resBatch.getHaveErrors())
-        {
-            System.out.print("Message sent batch has errors");
-        }
-        for (SendMessageResult resSend : resBatch.getResults()) {
-            if( resSend.getIsError()){
-                System.out.printf("Message enqueue error, error:%s",resSend.getError());
-            }else {
-                System.out.printf("Send to Queue Result: MessageID:%d, {}, Sent At:%t",resSend.getMessageID(),Converter.FromUnixTime(resSend.getSentAt()));
-
+            @Override
+            public void onError(Throwable t) {
+                
             }
+        
+            @Override
+            public void onCompleted() {
+                
+            }
+        };
+        channel.SendRequestAsync (request, response);     
+    }
+
+    private static void Queries_Sending_Query_Request() throws IOException, ServerAddressNotSuppliedException {
+        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+        io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
+        channelParameters.setChannelName(ChannelName);
+        channelParameters.setClientID(ClientID);
+        channelParameters.setKubeMQAddress(KubeMQServerAddress);
+        channelParameters.setRequestType(RequestType.Query);
+        channelParameters.setTimeout(1000);
+        io.kubemq.sdk.commandquery.Channel channel = new io.kubemq.sdk.commandquery.Channel(channelParameters);
+        Request request = new Request();
+        request.setBody(Converter.ToByteArray("hello kubemq - sending a query, please reply"));
+        Response result = channel.SendRequest(request);
+        if (!result.isExecuted()){  
             
-        }       
+           System.out.printf("Response error:{}",result.getError());
+        return;
+    }
+    System.out.printf("Response Received:{}, ExecutedAt {}",result.getRequestID(), result.getTimestamp());
     }
 
-    private static void Send_Message_to_a_Queue_with_Deadletter_Queue()
+    private static void Queries_Receiving_Query_Requests() throws SSLException, ServerAddressNotSuppliedException {
+        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+        Responder.RequestResponseObserver HandleIncomingRequests;
+        Responder responder = new Responder(KubeMQServerAddress);
+        HandleIncomingRequests = request -> {
+          
+        
+
+            Response response = new Response(request);
+            response.setCacheHit(false);
+            response.setError("None");
+            response.setClientID(ClientID);
+            response.setBody("got your query, you are good to goo".getBytes());
+            response.setExecuted(true);
+            response.setMetadata("this is a response");
+            response.setTimestamp(LocalDateTime.now());
+            return response;
+    };
+            SubscribeRequest subscribeRequest =new  SubscribeRequest();
+            subscribeRequest.setChannel(ChannelName);
+            subscribeRequest.setClientID(ClientID);
+            subscribeRequest.setSubscribeType(SubscribeType.Queries);
+
+            new Thread(){
+                public void run(){
+
+                    try {
+                    responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
+                } catch (SSLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ServerAddressNotSuppliedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                }
+            }.start();
+          
+    }
+
+    private static void Commands_Sending_Command_Request_async()
             throws ServerAddressNotSuppliedException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-            SendMessageResult resSend = queue.SendQueueMessage(new Message()
-            .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
-            .setMetadata("someMeta")
-            .setMaxReciveCount(3)
-            .setMaxReciveQueue("DeadLetterQueue")
-            );           
-            if (resSend.getIsError())
-            {
-                System.out.printf("Message enqueue error, error:%s",resSend.getError());
+        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+        io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
+        channelParameters.setChannelName(ChannelName);
+        channelParameters.setClientID(ClientID);
+        channelParameters.setKubeMQAddress(KubeMQServerAddress);
+        channelParameters.setRequestType(RequestType.Command);
+        channelParameters.setTimeout(1000);
+        io.kubemq.sdk.commandquery.Channel channel = new io.kubemq.sdk.commandquery.Channel(channelParameters);
+        Request request = new Request();
+        request.setBody(Converter.ToByteArray("hello kubemq - sending a command, please reply"));
+        StreamObserver<Response> response = new StreamObserver<Response>(){
+        
+            @Override
+            public void onNext(Response value) {
+                if (!value.isExecuted()){  
+            
+                    System.out.printf("Response error:{}",value.getError());
+
             }
+        }
+        
+            @Override
+            public void onError(Throwable t) {
+                System.out.printf("RPC Error:{}",t.getMessage());                
+            }
+        
+            @Override
+            public void onCompleted() {
+                
+            }
+        };
+        channel.SendRequestAsync (request, response);     
+
     }
 
-    private static void Send_Message_to_a_Queue_with_Delay() throws ServerAddressNotSuppliedException, IOException {
-            Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-            SendMessageResult resSend = queue.SendQueueMessage(new Message()
-            .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
-            .setMetadata("someMeta")
-            .setDelay(3)
-            );           
-            if (resSend.getIsError())
-            {
-                System.out.printf("Message enqueue error, error:%s",resSend.getError());
-            }
+    private static void Commands_Sending_Command_Request() throws IOException, ServerAddressNotSuppliedException {
+        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+        io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
+        channelParameters.setChannelName(ChannelName);
+        channelParameters.setClientID(ClientID);
+        channelParameters.setKubeMQAddress(KubeMQServerAddress);
+        channelParameters.setRequestType(RequestType.Command);
+        channelParameters.setTimeout(10000);
+        io.kubemq.sdk.commandquery.Channel channel = new io.kubemq.sdk.commandquery.Channel(channelParameters);
+        Request request = new Request();
+        request.setBody(Converter.ToByteArray("hello kubemq - sending a command, please reply"));
+        Response result = channel.SendRequest(request);
+        if (!result.isExecuted()){  
+          System.out.printf("Response error:{}",result.getError());    
+          return;
+    }
+    System.out.printf("Response Received:{}, ExecutedAt{}",result.getRequestID(),result.getTimestamp());  
     }
 
-    private static void Send_Message_to_a_Queue_with_Expiration()
+    private static void Commands_Receiving_Commands_Requests() throws SSLException, ServerAddressNotSuppliedException {
+        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+        Responder.RequestResponseObserver HandleIncomingRequests;
+        Responder responder = new Responder(KubeMQServerAddress);      
+        HandleIncomingRequests = request -> {
+          
+        
+
+            Response response = new Response(request);
+            response.setCacheHit(false);
+            response.setError("None");
+            response.setClientID(ClientID);
+            response.setBody("OK".getBytes());
+            response.setExecuted(true);
+            response.setMetadata("OK");
+            response.setTimestamp(LocalDateTime.now());
+            return response;
+    };
+            SubscribeRequest subscribeRequest =new  SubscribeRequest();
+            subscribeRequest.setChannel(ChannelName);
+            subscribeRequest.setClientID(ClientID);
+            subscribeRequest.setSubscribeType(SubscribeType.Commands);     
+
+            new Thread(){
+                public void run(){
+                    try {
+                    responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
+                } catch (SSLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ServerAddressNotSuppliedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                }
+            }.start();
+           
+    }
+
+    private static void Sending_Events_Store_Stream_Events_Store()
             throws ServerAddressNotSuppliedException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        SendMessageResult resSend = queue.SendQueueMessage(new Message()
-        .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
-        .setMetadata("someMeta")
-        .setExpiration(5)
-        );           
-        if (resSend.getIsError())
-        {
-            System.out.printf("Message enqueue error, error:%s",resSend.getError());
-        }
+        String ChannelName = "testing_event_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+ 
+
+       io.kubemq.sdk.event.Channel channel = new  io.kubemq.sdk.event.Channel(ChannelName, ClientID, false, KubeMQServerAddress);  
+       
+        StreamObserver<Result> streamResObserver =  new StreamObserver<Result>(){
+        
+            @Override
+            public void onNext(Result value) {
+                
+            }
+        
+            @Override
+            public void onError(Throwable t) {
+                System.out.printf("Could not send single message");      
+            }
+        
+            @Override
+            public void onCompleted() {
+                
+            }
+        };
+
+        StreamObserver<Event> stream = channel.StreamEvent(streamResObserver);
+         for (int i = 0; i < 10; i++) {
+            Event event = new  Event();
+            event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
+            event.setEventId("event-Store-"+i);
+              stream.onNext(event);
+         }
+       
     }
 
-    private static void Send_Message_to_a_Queue() throws ServerAddressNotSuppliedException, IOException {
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        SendMessageResult resSend = queue.SendQueueMessage(new Message()
-        .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
-        .setMetadata("someMeta")
-        );           
-        if (resSend.getIsError())
-        {
-            System.out.printf("Message enqueue error, error:%s",resSend.getError());
+    private static void Sending_Events_Store_Single_Event_to_Store() throws IOException {
+        String ChannelName = "testing_event_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+ 
+
+        io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, false, KubeMQServerAddress);  
+        for (int i = 0; i < 10; i++) {
+            Event event = new  Event();
+            event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
+            event.setEventId("event-Store-"+i);
+                    try {
+                        Result   result = channel.SendEvent(event);
+            } catch (SSLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ServerAddressNotSuppliedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
+      
+       
+    }
+          
+    
+
+    private static void Receiving_Events_Store() throws SSLException, ServerAddressNotSuppliedException {
+            String ChannelName = "testing_event_channel", ClientID = "hello-world-subscriber", KubeMQServerAddress = "localhost:50000";
+            Subscriber subscriber = new Subscriber(KubeMQServerAddress);
+            SubscribeRequest subscribeRequest = new SubscribeRequest();
+            subscribeRequest.setChannel(ChannelName);
+            subscribeRequest.setClientID(ClientID);
+            subscribeRequest.setSubscribeType(SubscribeType.EventsStore);   
+            subscribeRequest.setEventsStoreType(EventsStoreType.StartFromFirst); 
+            
+            
+            StreamObserver<EventReceive> streamObserver =new  StreamObserver<EventReceive>(){
+            
+                @Override
+                public void onNext(EventReceive value) {
+                    System.out.printf("Event Received: EventID:{eventReceive.EventID} Channel:{eventReceive.Channel} Metadata:{eventReceive.Metadata} Body:{ KubeMQ.SDK.csharp.Tools.Converter.FromByteArray(eventReceive.Body)}");
+      
+                }
+            
+                @Override
+                public void onError(Throwable t) {
+                    
+                }
+            
+                @Override
+                public void onCompleted() {
+                    
+                }
+            };
+            subscriber.SubscribeToEvents(subscribeRequest ,streamObserver );
+        
     }
 
-    private static void Ack_All_Messages_In_a_Queue() throws SSLException, ServerAddressNotSuppliedException {
+    private static void Sending_Events_Stream_Events() throws ServerAddressNotSuppliedException, IOException {
+        String ChannelName = "testing_event_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+ 
 
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
-        AckAllMessagesResponse resAck = queue.AckAllQueueMessages();
-        if (resAck.getIsError())
-        {
-            System.out.printf("AckAllQueueMessagesResponse error, error:%s",resAck.getError());
-                   return;
-        }
-        System.out.printf("Ack All Messages:%d completed",resAck.getAffectedMessages());
+        io.kubemq.sdk.event.Channel  channel = new   io.kubemq.sdk.event.Channel(ChannelName, ClientID, false, KubeMQServerAddress);  
+        Event event = new  Event();
+        event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
+       
+        StreamObserver<Result> streamResObserver =  new StreamObserver<Result>(){
+        
+            @Override
+            public void onNext(Result value) {
+                System.out.printf("s");
+            }
+        
+            @Override
+            public void onError(Throwable t) {
+                System.out.printf("Could not send single message");      
+            }
+        
+            @Override
+            public void onCompleted() {
+                
+            }
+        };
+     
+         StreamObserver<Event> stream = channel.StreamEvent(streamResObserver);
+         stream.onNext(event);            
+         
+    }
+
+    private static void Sending_Events_Single_Event() throws IOException {
+        String ChannelName = "testing_event_channel", ClientID = "hello-world-sender", KubeMQServerAddress = "localhost:50000";
+ 
+
+        io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, false, KubeMQServerAddress);  
+        Event event = new  Event();
+        event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
+        Result result;
+        try {
+            result = channel.SendEvent(event);
+            if(!result.isSent()){
+                System.out.printf("Could not send single message");       
+                return;     
+            }
+        } catch (ServerAddressNotSuppliedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
 
     }
+
+    private static void Receiving_Events() throws SSLException, ServerAddressNotSuppliedException {
+        String ChannelName = "testing_event_channel", ClientID = "hello-world-subscriber", KubeMQServerAddress = "localhost:50000";
+        Subscriber subscriber = new Subscriber(KubeMQServerAddress);
+        SubscribeRequest subscribeRequest = new SubscribeRequest();
+        subscribeRequest.setChannel(ChannelName);
+        subscribeRequest.setClientID(ClientID);
+        subscribeRequest.setSubscribeType(SubscribeType.Events);    
+        
+        StreamObserver<EventReceive> streamObserver =new  StreamObserver<EventReceive>(){
+        
+            @Override
+            public void onNext(EventReceive value) {
+                System.out.printf("Event Received: EventID:{eventReceive.EventID} Channel:{eventReceive.Channel} Metadata:{eventReceive.Metadata} Body:{ KubeMQ.SDK.csharp.Tools.Converter.FromByteArray(eventReceive.Body)}");
+  
+            }
+        
+            @Override
+            public void onError(Throwable t) {
+             System.out.printf("Event Received Error:{ }", t.toString()); 
+            }
+        
+            @Override
+            public void onCompleted() {
+                
+            }
+        };
+        subscriber.SubscribeToEvents(subscribeRequest ,streamObserver );
+
+      
+    }
+
+    
 }
