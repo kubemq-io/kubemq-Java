@@ -101,7 +101,7 @@ public class SubscribeRequest {
                 .setClientID(clientID)
                 .setChannel(channel)
                 .setGroup(Optional.ofNullable(group).orElse(""))
-                .setEventsStoreTypeData(Kubemq.Subscribe.EventsStoreType.forNumber(eventsStoreType.getValue()))
+                .setEventsStoreTypeData(Kubemq.Subscribe.EventsStoreType.forNumber(eventsStoreType ==null ?  0: eventsStoreType.getValue()))
                 .setEventsStoreTypeValue(eventsStoreTypeValue)
                 .build();
     }

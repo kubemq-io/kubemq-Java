@@ -140,6 +140,7 @@ public class Request {
                 .setTimeout(timeout)
                 .setCacheKey(Optional.ofNullable(cacheKey).orElse(""))
                 .setCacheTTL(cacheTTL)
+                .setRequestTypeData(io.kubemq.sdk.grpc.Kubemq.Request.RequestType.values()[requestType.getValue()])
                 .build();
     }
 
