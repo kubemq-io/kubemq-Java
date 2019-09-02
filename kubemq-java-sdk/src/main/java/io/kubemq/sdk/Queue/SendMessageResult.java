@@ -25,32 +25,56 @@ package io.kubemq.sdk.Queue;
 
 import io.kubemq.sdk.grpc.Kubemq.SendQueueMessageResult;
 
+/**
+ * Queue request execution result.
+ */
 public class SendMessageResult {    
     private SendQueueMessageResult sendQueueMessageResult;
 
-    public SendMessageResult(SendQueueMessageResult rec) {
+    protected SendMessageResult(SendQueueMessageResult rec) {
         this.sendQueueMessageResult = rec;
     }
-    
+    /**
+     * Unique for message
+     * @return Message ID.
+     */
     public String getMessageID() {
         return this.sendQueueMessageResult.getMessageID();
     }
-  
+    
+    /**
+     * Returned from KubeMQ, false if no error.
+     * @return False if no error.
+     */
     public Boolean getIsError(){
       return this.sendQueueMessageResult.getIsError();    
     }
+    /**
+     * Error message, valid only if IsError true.
+     * @return Error message.
+     */
     public String getError(){
         return this.sendQueueMessageResult.getError();    
       }
-  
+      /**
+       * Message expiration time.
+       * @return Message expiration in Unix format.
+       */
     public Long getExpirationAt(){
       return this.sendQueueMessageResult.getExpirationAt();
     }
-  
+  /**
+   * Message sent time.
+   * @return Message sent in Unix format.
+   */
     public Long getSentAt(){
       return this.sendQueueMessageResult.getSentAt();
     }
   
+    /**
+     * Message delayed delivery by KubeMQ.
+     * @return Delayed delivery in Unix format.
+     */
     public long getDelayedTo() {
         return this.sendQueueMessageResult.getDelayedTo();
   }

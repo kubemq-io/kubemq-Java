@@ -25,27 +25,40 @@ package io.kubemq.sdk.Queue;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
-
 import io.kubemq.sdk.grpc.Kubemq.QueueMessagesBatchResponse;
 import io.kubemq.sdk.grpc.Kubemq.SendQueueMessageResult;
 
+/**
+ * Queue request batch execution result.
+ */
 public class SendBatchMessageResult {
 
 	private QueueMessagesBatchResponse queueMessagesBatchResponse;
 
-    public SendBatchMessageResult(QueueMessagesBatchResponse rec) {
+    protected SendBatchMessageResult(QueueMessagesBatchResponse rec) {
         queueMessagesBatchResponse =rec;
     }  
     
+    /**
+     * Unique for Request
+     * @return Batch ID
+     */
     public String getBatchID(){
         return this.queueMessagesBatchResponse.getBatchID();
     }
 
+    /**
+     * Returned if one or more messages process has error, false if no error.
+     * @return False if no error.
+     */
     public Boolean getHaveErrors(){
         return this.queueMessagesBatchResponse.getHaveErrors();
     }
 
+    /**
+     * Collection of batch individual execution result.
+     * @return execution results. 
+     */
 	public Iterable<SendMessageResult> getResults() {
         Collection<SendMessageResult> batch = new ArrayList<SendMessageResult>();
         for (SendQueueMessageResult var :  this.queueMessagesBatchResponse.getResultsList()) {

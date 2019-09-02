@@ -24,248 +24,244 @@
 package io.kubemq.sdk.Queue;
 
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLException;
 
-import io.grpc.ClientCall;
-import io.grpc.netty.shaded.io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.WaitStrategy;
-import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
-
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesRequest;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse;
-import io.kubemq.sdk.grpc.kubemqGrpc.kubemqStub;
 import io.kubemq.sdk.tools.IDGenerator;
-import io.kubemq.sdk.grpc.kubemqGrpc;
-
 
 /**
  * Advance manipulation of messages using stream
  */
 public class Transaction extends GrpcClient {
-   
 
     static Semaphore semaphore = new Semaphore(1);
 
     private Queue queue;
     protected StreamQueueMessagesResponse msg;
-    private  StreamObserver<StreamQueueMessagesResponse> respStreamObserver;
-    private StreamObserver<StreamQueueMessagesRequest> reqStreamObserver; 
+    private StreamObserver<StreamQueueMessagesResponse> respStreamObserver;
+    private StreamObserver<StreamQueueMessagesRequest> reqStreamObserver;
 
     private final Object lock = new Object();
     private Boolean stremResponded = false;
 
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
         this.queue = queue;
-        this._kubemqAddress=queue.getServerAddress();
+        this._kubemqAddress = queue.getServerAddress();
     }
 
     /**
      * Receive queue messages request , waiting for response or timeout.
+     * 
      * @param visibilitySeconds message access lock by receiver.
-     * @param waitTimeSeconds Wait time of request., default is from queue
-     * @return
-     * @throws SSLException
-     * @throws ServerAddressNotSuppliedException
+     * @param waitTimeSeconds   Wait time of request., default is from queue
+     * @return Transaction response
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
      */
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
-    throws SSLException, ServerAddressNotSuppliedException {
-if(msg!=null)     {
-    return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
-}
-Kubemq.StreamQueueMessagesResponse resp;
-OpenStream();
-try {
-    resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
-            .setClientID(this.queue.getClientID())
-            .setChannel(this.queue.getQueueName())
-            .setRequestID(IDGenerator.Getid())
-            .setStreamRequestTypeData(Kubemq.StreamRequestType.ReceiveMessage)
-            .setVisibilitySeconds(visibilitySeconds)
-            .setWaitTimeSeconds(waitTimeSeconds).build());
-} catch (InterruptedException e) {
-    // TODO Auto-generated catch block
-    e.printStackTrace();
-    return null;
-}
-
-
-return new TransactionMessagesResponse(resp);
-
-}
-
-
-    public TransactionMessagesResponse Modify(Message setMetadata)
             throws SSLException, ServerAddressNotSuppliedException {
-                if(msg==null)     {
-                    return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
-                }
-        Kubemq.StreamQueueMessagesResponse resp;
-        try {
-            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
-                    .setClientID(this.queue.getClientID())                   
-                    .setRequestID(IDGenerator.Getid())
-                    .setStreamRequestTypeData(Kubemq.StreamRequestType.SendModifiedMessage)
-                    .setModifiedMessage(setMetadata.toQueueMessage())
-                    .build());
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
+        if (msg != null) {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
+        Kubemq.StreamQueueMessagesResponse resp;
+        OpenStream();
 
-       
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.ReceiveMessage)
+                .setVisibilitySeconds(visibilitySeconds).setWaitTimeSeconds(waitTimeSeconds).build());
+
         return new TransactionMessagesResponse(resp);
-	}
 
-	public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
+    }
+
+    /**
+     * Will mark Message dequeued on queue.
+     * 
+     * @return Transaction response.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public TransactionMessagesResponse AckMessage() throws SSLException, ServerAddressNotSuppliedException {
+        if (msg == null) {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+        }
+        Kubemq.StreamQueueMessagesResponse resp;
+
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.AckMessage)
+                .setRefSequence(msg.getMessage().getAttributes().getSequence()).build());
+
+        return new TransactionMessagesResponse(resp);
+    }
+
+    /**
+     * Will return message to queue.
+     * 
+     * @return Transaction response.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public TransactionMessagesResponse RejectMessage() throws SSLException, ServerAddressNotSuppliedException {
+        if (msg == null) {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+        }
+        Kubemq.StreamQueueMessagesResponse resp;
+
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.RejectMessage)
+                .setRefSequence(msg.getMessage().getAttributes().getSequence()).build());
+
+        return new TransactionMessagesResponse(resp);
+    }
+
+    /**
+     * Extend the visibility time for the current receive message
+     * 
+     * @param visibilitySeconds New viability time.
+     * @return Transaction response.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
             throws SSLException, ServerAddressNotSuppliedException {
-                if(msg==null)     {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
+        if (msg == null) {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
-        try {
-            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
-                    .setClientID(this.queue.getClientID())
-                    .setChannel(this.queue.getQueueName())
-                    .setRequestID(IDGenerator.Getid())
-                    .setStreamRequestTypeData(Kubemq.StreamRequestType.ModifyVisibility)
-                    .build());
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
 
-       
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.ModifyVisibility).build());
+
         return new TransactionMessagesResponse(resp);
 
-	}
+    }
 
-    public TransactionMessagesResponse AckMessage()
-            throws SSLException, ServerAddressNotSuppliedException {
-                if(msg==null)     {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
+    /**
+     * Resend the current received message to a new channel and ack the current
+     * message.
+     * 
+     * @param queueName Resend queue name.
+     * @return Transaction response.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public TransactionMessagesResponse ReSend(String queueName) throws SSLException, ServerAddressNotSuppliedException {
+        if (msg == null) {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
-        try {
-            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
-                    .setClientID(this.queue.getClientID())
-                    .setChannel(this.queue.getQueueName())
-                    .setRequestID(IDGenerator.Getid())
-                    .setStreamRequestTypeData(Kubemq.StreamRequestType.AckMessage)
-                    .setRefSequence(msg.getMessage().getAttributes().getSequence()).build());
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setChannel(queueName).setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.ResendMessage).build());
 
         return new TransactionMessagesResponse(resp);
-	}
+    }
 
-	public TransactionMessagesResponse RejectMessage() throws SSLException, ServerAddressNotSuppliedException {
-        if(msg==null)     {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
+    /**
+     * Resend the current received message message to a new channel.
+     * 
+     * @param message New message
+     * @return Transaction response.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public TransactionMessagesResponse Modify(Message message) throws SSLException, ServerAddressNotSuppliedException {
+        if (msg == null) {
+            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
-        try {
-            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
-                    .setClientID(this.queue.getClientID())
-                    .setChannel(this.queue.getQueueName())
-                    .setRequestID(IDGenerator.Getid()).setStreamRequestTypeData(Kubemq.StreamRequestType.RejectMessage)
-                    .setRefSequence(msg.getMessage().getAttributes().getSequence())
-                    .build());
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.SendModifiedMessage)
+                .setModifiedMessage(message.toQueueMessage()).build());
 
         return new TransactionMessagesResponse(resp);
-	}
-	public TransactionMessagesResponse ReSend(String string) throws SSLException, ServerAddressNotSuppliedException {
-        if(msg==null)     {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject",null,null);
-        }
-        Kubemq.StreamQueueMessagesResponse resp;
-        try {
-            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
-                    .setClientID(this.queue.getClientID())
-                    .setChannel(this.queue.getQueueName())
-                    .setRequestID(IDGenerator.Getid())
-                    .setStreamRequestTypeData(Kubemq.StreamRequestType.ResendMessage)            
-                    .build());
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
-
-        return new TransactionMessagesResponse(resp);
-	}
-
+    }
 
     private boolean OpenStream() {
-        
-        if (respStreamObserver == null){
 
-            
-            respStreamObserver =new StreamObserver<Kubemq.StreamQueueMessagesResponse>() {
+        if (respStreamObserver == null) {
 
-            @Override
-            public void onNext(StreamQueueMessagesResponse value) {
-                synchronized(lock){
-                    if (value.getIsError()){
-                        msg =null;
+            respStreamObserver = new StreamObserver<Kubemq.StreamQueueMessagesResponse>() {
+
+                @Override
+                public void onNext(StreamQueueMessagesResponse value) {
+                    synchronized (lock) {
+                        if (value.getIsError()) {
+                            msg = value;
+                        } else {
+                            msg = value;
+                        }
+
+                        stremResponded = true;
+                        lock.notify();
                     }
-                    else{
-                        msg = value;
-                    }
+                }
 
+                @Override
+                public void onError(Throwable t) {
+                    msg = null;
                     stremResponded = true;
                     lock.notify();
                 }
-            }
 
-            @Override
-            public void onError(Throwable t) {
-                msg=null;
-                stremResponded = true;
-                lock.notify();
-            }
+                @Override
+                public void onCompleted() {
+                    msg = null;
+                    stremResponded = true;
+                    reqStreamObserver = null;
 
-            @Override
-            public void onCompleted() {
-                msg=null;     
-                stremResponded = true;          
-                reqStreamObserver =null;  
-               
-            }
-        };
-    }
+                }
+            };
+        }
         return true;
     }
-   
-    private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr) throws SSLException, ServerAddressNotSuppliedException, InterruptedException {
-      
-         if (reqStreamObserver == null){
-        reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);
-         }
-         stremResponded=false;
-        reqStreamObserver.onNext(sr);
-   
-        synchronized(lock){
-            while (!stremResponded) {
-              lock.wait();                
-            }
-           }
-      return msg;
-    }
 
+    private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr)
+            throws SSLException, ServerAddressNotSuppliedException {
+
+        if (reqStreamObserver == null) {
+            reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);
+        }
+        stremResponded = false;
+        reqStreamObserver.onNext(sr);
+
+        synchronized (lock) {
+            while (!stremResponded) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }
+        return msg;
+    }
 
 }

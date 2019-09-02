@@ -23,26 +23,19 @@
  */
 package io.kubemq.sdk.Queue;
 
-
 import com.google.protobuf.ByteString;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.QueueMessage;
 import io.kubemq.sdk.grpc.Kubemq.QueueMessageAttributes;
 import io.kubemq.sdk.grpc.Kubemq.QueueMessagePolicy;
-import io.kubemq.sdk.tools.Converter;
 import io.kubemq.sdk.tools.IDGenerator;
-
-import java.security.Policy;
-import java.util.Dictionary;
 import java.util.Map;
 
+/**
+ * Queue stored message
+ */
+public class Message {
 
-
-
-
-
-public class Message {    
-  
   private String messageID;
   private String clientID;
   private String metadata;
@@ -51,124 +44,222 @@ public class Message {
   private QueueMessagePolicy policy;
   private Map<String, String> tags;
   private String queueName;
-  
 
-     /**
-      * Queue stored message
-      * @param body The information that you want to pass.
-      * @param metadata General information about the message body.
-      * @param messageID Unique for message
-      * @param tags Dictionary of string , string pair:A set of Key value pair that help categorize the message.
-      */
-    public Message(byte[] body, String metadata, String messageID, Map<String, String> tags) {
+  /**
+   * Queue stored message
+   * 
+   * @param body      The information that you want to pass.
+   * @param metadata  General information about the message body.
+   * @param messageID Unique for message
+   * @param tags      Dictionary of string , string pair:A set of Key value pair
+   *                  that help categorize the message.
+   */
+  public Message(byte[] body, String metadata, String messageID, Map<String, String> tags) {
     this.body = body;
     this.metadata = metadata;
     this.tags = tags;
-    }
-
-    public Message(Kubemq.QueueMessage queueMessage)
-    {
-     this.attributes = queueMessage.getAttributes();
-     this.policy = queueMessage.getPolicy();
-     this.clientID = queueMessage.getClientID();
-     this.metadata = queueMessage.getMetadata();
-     this.body =  queueMessage.getBody().toByteArray();
-     this.tags = queueMessage.getTagsMap();
-     this.queueName = queueMessage.getChannel();
-    }
-   
-    public Message() {      
-	}
-
-	public String getMessageID() {
-      return this.messageID;
   }
 
-  public String getClientID(){
-    return this.clientID;    
+  /**
+   * Queue stored message
+   */
+  public Message() {
   }
 
-  public String getQueue(){
+  protected Message(Kubemq.QueueMessage queueMessage) {
+    this.attributes = queueMessage.getAttributes();
+    this.policy = queueMessage.getPolicy();
+    this.clientID = queueMessage.getClientID();
+    this.metadata = queueMessage.getMetadata();
+    this.body = queueMessage.getBody().toByteArray();
+    this.tags = queueMessage.getTagsMap();
+    this.queueName = queueMessage.getChannel();
+  }
+
+  /**
+   * Unique for message
+   * 
+   * @return Unique ID
+   */
+  public String getMessageID() {
+    return this.messageID;
+  }
+
+  /**
+   * Represents the sender ID that the messages will be send under.
+   * 
+   * @return sender ID
+   */
+  public String getClientID() {
+    return this.clientID;
+  }
+
+  /**
+   * Represents the sender ID that the messages will be send under
+   * 
+   * @param clientID
+   * @return this Message
+   */
+  public Message setClientID(String clientID) {
+    this.clientID = clientID;
+    return this;
+  }
+
+  /**
+   * Represents The FIFO queue name to send to using the KubeMQ.
+   * 
+   * @return Queue name
+   */
+  public String getQueue() {
     return this.queueName;
   }
 
-  public String getMetadata(){
+  /**
+   * Represents The FIFO queue name to send to using the KubeMQ.
+   * 
+   * @param queueName Queue name
+   * @return this Message
+   */
+  public Message setQueue(String queueName) {
+    this.queueName = queueName;
+    return this;
+  }
+
+  /**
+   * General information about the message body.
+   * 
+   * @return Metadata
+   */
+  public String getMetadata() {
     return this.metadata;
   }
 
+  /**
+   * General information about the message body.
+   * 
+   * @param metadata General information
+   * @return this Message
+   */
+  public Message setMetadata(String metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  /**
+   * The information that you want to pass.
+   * 
+   * @return Message encoded body
+   */
   public byte[] getBody() {
     return this.body;
-}
-public Message setBody(byte[] body) {
- this.body = body;
- return this;
-}
+  }
 
-public Kubemq.QueueMessageAttributes getQueueMessageAttributes() {
-  return this.attributes;
-}
+  /**
+   * The information that you want to pass.
+   * 
+   * @param body Message encoded body
+   * @return this Message
+   */
+  public Message setBody(byte[] body) {
+    this.body = body;
+    return this;
+  }
 
-public Kubemq.QueueMessagePolicy getMessagePolicy() {
-  return this.policy;
-}
+  /**
+   * A set of Key value pair that help categorize the message.
+   * 
+   * @return Message tags
+   */
+  public Map<String, String> getTags() {
+    return this.tags;
+  }
 
-public Message setQueue(String queueName) {
-  this.queueName = queueName;
-  return this;
-}
+  /**
+   * A set of Key value pair that help categorize the message.
+   * 
+   * @param key   Tag key
+   * @param value Tag value
+   * @return this Message
+   */
+  public Message setTag(String key, String value) {
+    this.tags.putIfAbsent(key, value);
+    return this;
+  }
 
-public Message setClientID(String clientID) {
-  this.clientID =clientID;
-  return this;
-}
+  /**
+   * Information of received message
+   * 
+   * @return Message attributes
+   */
+  public Kubemq.QueueMessageAttributes getQueueMessageAttributes() {
+    return this.attributes;
+  }
 
-public Map<String,String> getTags() {
-	return this.tags;
-}
+  /**
+   * Information of received message
+   * 
+   * @return Message policy
+   */
+  public Kubemq.QueueMessagePolicy getMessagePolicy() {
+    return this.policy;
+  }
 
-public Message setMetadata(String metadata) {
-  this.metadata = metadata;
-  return this;
-}
-public Message setPolicy(Kubemq.QueueMessagePolicy queueMessagePolicy) {
-  this.policy = queueMessagePolicy;
-  return this;
-}
+  /**
+   * Message policy max number of recived message before routing to "Dead letter"
+   * queue.
+   * 
+   * @param maxReciveCount
+   * @return this Message
+   */
+  public Message setMaxReciveCount(int maxReciveCount) {
+    this.policy.newBuilderForType().setMaxReceiveCount(maxReciveCount).build();
+    return this;
+  }
 
-protected QueueMessage toQueueMessage() {
-Kubemq.QueueMessage x =  Kubemq.QueueMessage.newBuilder()
-.setMessageID(this.messageID==null ? IDGenerator.Getid() : this.getMessageID())
-.setClientID(this.clientID)
-.setChannel(this.queueName)
-.setBody(ByteString.copyFrom(this.body))
-.setMetadata(this.metadata)
-.build();
-if(this.policy!=null){
-    x.newBuilderForType().setPolicy(this.policy).build();
-}
-if(this.tags!=null){
-  x.newBuilderForType().putAllTags(this.tags).build();
-}
-return x;
-}
+  /**
+   * Message policy max "Dead letter" queue
+   * 
+   * @param maxReciveQueue "Dead letter" queue name when maxReciveCount hit.
+   * @return this Message
+   */
+  public Message setMaxReciveQueue(String maxReciveQueue) {
+    this.policy.newBuilderForType().setMaxReceiveQueue(maxReciveQueue).build();
+    return this;
+  }
 
-public Message setExpiration(int expiration) {
-  this.policy.newBuilderForType().setExpirationSeconds(expiration).build();
-  return this;
-}
+  /**
+   * Message policy message expiration in seconds
+   * 
+   * @param expiration expiration in seconds
+   * @return this Message
+   */
+  public Message setExpiration(int expiration) {
+    this.policy.newBuilderForType().setExpirationSeconds(expiration).build();
+    return this;
+  }
 
-public Message setDelay(int delay) {
-  this.policy.newBuilderForType().setDelaySeconds(delay).build();
-  return this;
-}
+  /**
+   * Message policy message delay delivery
+   * 
+   * @param delay delay delivery in seconds
+   * @return this Message
+   */
+  public Message setDelay(int delay) {
+    this.policy.newBuilderForType().setDelaySeconds(delay).build();
+    return this;
+  }
 
-public Message setMaxReciveCount(int maxReciveCount) {
-  this.policy.newBuilderForType().setMaxReceiveCount(maxReciveCount).build();
-  return this;
-}
+  protected QueueMessage toQueueMessage() {
+    Kubemq.QueueMessage tempmsg = Kubemq.QueueMessage.newBuilder()
+        .setMessageID(this.messageID == null ? IDGenerator.Getid() : this.getMessageID()).setClientID(this.clientID)
+        .setChannel(this.queueName).setBody(ByteString.copyFrom(this.body)).setMetadata(this.metadata).build();
+    if (this.policy != null) {
+      tempmsg.newBuilderForType().setPolicy(this.policy).build();
+    }
+    if (this.tags != null) {
+      tempmsg.newBuilderForType().putAllTags(this.tags).build();
+    }
+    return tempmsg;
+  }
 
-public Message setMaxReciveQueue(String maxReciveQueue) {
-  this.policy.newBuilderForType().setMaxReceiveQueue(maxReciveQueue).build();
-  return this;
-}
 }

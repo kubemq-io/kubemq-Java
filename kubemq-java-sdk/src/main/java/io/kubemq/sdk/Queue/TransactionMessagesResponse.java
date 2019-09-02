@@ -26,14 +26,18 @@ package io.kubemq.sdk.Queue;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse;
 
+/**
+ * Transaction response
+ */
 public class TransactionMessagesResponse {
     private StreamQueueMessagesResponse streamQueueMessagesResponse;
     private Message message;
 
-	public TransactionMessagesResponse(Kubemq.StreamQueueMessagesResponse streamQueueMessagesResponse){
+	protected TransactionMessagesResponse(Kubemq.StreamQueueMessagesResponse streamQueueMessagesResponse){
         this.streamQueueMessagesResponse = streamQueueMessagesResponse;        
     }
-    public TransactionMessagesResponse(String errorMessage, Message msg, String requestID){
+
+    protected TransactionMessagesResponse(String errorMessage, Message msg, String requestID){
         this.streamQueueMessagesResponse=   Kubemq.StreamQueueMessagesResponse.newBuilder()
         .setIsError(true)     
         .setError(errorMessage)
@@ -42,23 +46,46 @@ public class TransactionMessagesResponse {
         this.message = msg;
     }
 
+    /**
+     * Unique for Request
+     * @return Request ID.
+     */
     public String getRequestID() {
         return this.streamQueueMessagesResponse.getRequestID();
     }
   
-    public Boolean getIsError(){
-        return this.streamQueueMessagesResponse.getIsError();    
-      }
-    public String getError(){
-        return this.streamQueueMessagesResponse.getError();    
-    } 
+      /**
+     * Returned from KubeMQ, false if no error.
+     * 
+     * @return False if no error.
+     */
+    public Boolean getIsError() {
+        return this.streamQueueMessagesResponse.getIsError();
+    }
 
+    /**
+     * Error message, valid only if IsError true.
+     * 
+     * @return Error message.
+     */
+    public String getError() {
+        return this.streamQueueMessagesResponse.getError();
+    }
+
+    /**
+     * The received Message
+     * @return Transaction message.
+     */
     public  Message getMessage(){
         if (this.message==null){
             this.message =new Message(this.streamQueueMessagesResponse.getMessage());
         }
         return message;
     }
+    /**
+     * Request action: ReceiveMessage, AckMessage, RejectMessage, ModifyVisibility, ResendMessage,  SendModifiedMessage, Unknown
+     * @return ReceiveMessage, AckMessage, RejectMessage, ModifyVisibility, ResendMessage,  SendModifiedMessage, Unknown.
+     */
     public Kubemq.StreamRequestType gStreamRequestType() {
         return this.streamQueueMessagesResponse.getStreamRequestTypeData();
     }

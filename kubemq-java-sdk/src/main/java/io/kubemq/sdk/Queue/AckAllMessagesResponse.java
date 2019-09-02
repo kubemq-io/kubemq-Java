@@ -23,28 +23,48 @@
  */
 package io.kubemq.sdk.Queue;
 
-import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.AckAllQueueMessagesResponse;
 
+/**
+ * Queue purge messages request execution result (will not delete data).
+ */
 public class AckAllMessagesResponse {
 
 	private AckAllQueueMessagesResponse ackAllQueueMessagesResponse;
 
-    public AckAllMessagesResponse(AckAllQueueMessagesResponse rec) {
+    protected AckAllMessagesResponse(AckAllQueueMessagesResponse rec) {
         ackAllQueueMessagesResponse =rec;        
     }
     
+    /**
+     * Unique for Request.
+     * @return Request ID.
+     */
     public String getRequestID() {
         return this.ackAllQueueMessagesResponse.getRequestID();
     }
-  
-    public Boolean getIsError(){
-        return this.ackAllQueueMessagesResponse.getIsError();    
-      }
-    public String getError(){
-        return this.ackAllQueueMessagesResponse.getError();    
+   /**
+     * Returned from KubeMQ, false if no error.
+     * 
+     * @return False if no error.
+     */
+    public Boolean getIsError() {
+        return this.ackAllQueueMessagesResponse.getIsError();
     }
 
+    /**
+     * Error message, valid only if IsError true.
+     * 
+     * @return Error message.
+     */
+    public String getError() {
+        return this.ackAllQueueMessagesResponse.getError();
+    }
+
+    /**
+     * Number of affected messages.
+     * @return Number of affected messages.
+     */
     public long getAffectedMessages(){
         return this.ackAllQueueMessagesResponse.getAffectedMessages();
     }

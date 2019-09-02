@@ -23,44 +23,89 @@
  */
 package io.kubemq.sdk.Queue;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import io.kubemq.sdk.grpc.Kubemq.QueueMessage;
 import io.kubemq.sdk.grpc.Kubemq.ReceiveQueueMessagesResponse;
-import io.kubemq.sdk.tools.Converter;
 
-public class ReceiveMessagesResponse{
+/**
+ * Queue response.
+ */
+public class ReceiveMessagesResponse {
 
-	private ReceiveQueueMessagesResponse receiveQueueMessagesResponse;
+    private ReceiveQueueMessagesResponse receiveQueueMessagesResponse;
 
-    public ReceiveMessagesResponse(ReceiveQueueMessagesResponse rec) {
-        receiveQueueMessagesResponse =rec;
+    protected ReceiveMessagesResponse(ReceiveQueueMessagesResponse rec) {
+        receiveQueueMessagesResponse = rec;
     }
 
+    /**
+     * Unique for Request
+     * 
+     * @return Request ID.
+     */
     public String getRequestID() {
         return this.receiveQueueMessagesResponse.getRequestID();
     }
-  
-    public Boolean getIsError(){
-        return this.receiveQueueMessagesResponse.getIsError();    
-      }
-    public String getError(){
-        return this.receiveQueueMessagesResponse.getError();    
-    }
-    public Boolean getIsPeak(){
-        return this.receiveQueueMessagesResponse.getIsPeak();    
+
+    /**
+     * Returned from KubeMQ, false if no error.
+     * 
+     * @return False if no error.
+     */
+    public Boolean getIsError() {
+        return this.receiveQueueMessagesResponse.getIsError();
     }
 
-    public Iterable<? extends Message> getMessages(){
-        return Converter.FromQueueMessages(this.receiveQueueMessagesResponse.getMessagesList());
+    /**
+     * Error message, valid only if IsError true.
+     * 
+     * @return Error message.
+     */
+    public String getError() {
+        return this.receiveQueueMessagesResponse.getError();
     }
 
-    public int getMessagesExpired(){
+    /**
+     * Indicate if the request was peek, true if peek.
+     * 
+     * @return True if peek.
+     */
+    public Boolean getIsPeek() {
+        return this.receiveQueueMessagesResponse.getIsPeak();
+    }
+
+    /**
+     * Collection of Messages.
+     * 
+     * @return Collection of Messages.
+     */
+    public Iterable<? extends Message> getMessages() {
+
+        Collection<Message> cltn = new ArrayList<Message>(); 
+        for (QueueMessage queueMessage : this.receiveQueueMessagesResponse.getMessagesList()) {
+            cltn.add(new Message(queueMessage));
+        }
+        return cltn;
+    }
+
+    /**
+     * Count of messages expired.
+     * 
+     * @return Number of messages expired.
+     */
+    public int getMessagesExpired() {
         return this.receiveQueueMessagesResponse.getMessagesExpired();
     }
 
-    public int getMessagesReceived(){
+    /**
+     * Count of received messages.
+     * 
+     * @return Number of received messages.
+     */
+    public int getMessagesReceived() {
         return this.receiveQueueMessagesResponse.getMessagesReceived();
     }
 
-
-    
-    
 }
