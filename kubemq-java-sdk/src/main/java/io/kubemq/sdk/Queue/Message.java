@@ -58,6 +58,7 @@ public class Message {
     this.body = body;
     this.metadata = metadata;
     this.tags = tags;
+    this.messageID = messageID;    
   }
 
   /**
@@ -74,6 +75,7 @@ public class Message {
     this.body = queueMessage.getBody().toByteArray();
     this.tags = queueMessage.getTagsMap();
     this.queueName = queueMessage.getChannel();
+    this.messageID =queueMessage.getMessageID();
   }
 
   /**
