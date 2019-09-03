@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.Queue;
 
+import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
 import javax.net.ssl.SSLException;
@@ -48,7 +49,7 @@ public class Transaction extends GrpcClient {
     private StreamObserver<StreamQueueMessagesRequest> reqStreamObserver;
 
     private final Object lock = new Object();
-    private Boolean stremResponded = false;
+    private Boolean streamResponded = false;
 
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
         this.queue = queue;
@@ -61,13 +62,12 @@ public class Transaction extends GrpcClient {
      * @param visibilitySeconds message access lock by receiver.
      * @param waitTimeSeconds   Wait time of request., default is from queue
      * @return Transaction response
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws IOException Error in response from stream
      */
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
-            throws SSLException, ServerAddressNotSuppliedException {
+            throws ServerAddressNotSuppliedException, IOException {
         if (msg != null) {
             return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
@@ -87,12 +87,11 @@ public class Transaction extends GrpcClient {
      * Will mark Message dequeued on queue.
      * 
      * @return Transaction response.
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws IOException Error in response from stream
      */
-    public TransactionMessagesResponse AckMessage() throws SSLException, ServerAddressNotSuppliedException {
+    public TransactionMessagesResponse AckMessage() throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
             return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
@@ -110,12 +109,11 @@ public class Transaction extends GrpcClient {
      * Will return message to queue.
      * 
      * @return Transaction response.
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws IOException Error in response from stream
      */
-    public TransactionMessagesResponse RejectMessage() throws SSLException, ServerAddressNotSuppliedException {
+    public TransactionMessagesResponse RejectMessage() throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
             return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
@@ -134,13 +132,12 @@ public class Transaction extends GrpcClient {
      * 
      * @param visibilitySeconds New viability time.
      * @return Transaction response.
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws IOException Error in response from stream
      */
     public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
-            throws SSLException, ServerAddressNotSuppliedException {
+            throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
             return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
@@ -160,12 +157,11 @@ public class Transaction extends GrpcClient {
      * 
      * @param queueName Resend queue name.
      * @return Transaction response.
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws IOException Error in response from stream
      */
-    public TransactionMessagesResponse ReSend(String queueName) throws SSLException, ServerAddressNotSuppliedException {
+    public TransactionMessagesResponse ReSend(String queueName) throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
             return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
@@ -183,12 +179,11 @@ public class Transaction extends GrpcClient {
      * 
      * @param message New message
      * @return Transaction response.
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws IOException Error in response from stream
      */
-    public TransactionMessagesResponse Modify(Message message) throws SSLException, ServerAddressNotSuppliedException {
+    public TransactionMessagesResponse Modify(Message message) throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
             return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
         }
@@ -217,7 +212,7 @@ public class Transaction extends GrpcClient {
                             msg = value;
                         }
 
-                        stremResponded = true;
+                        streamResponded = true;
                         lock.notify();
                     }
                 }
@@ -225,14 +220,14 @@ public class Transaction extends GrpcClient {
                 @Override
                 public void onError(Throwable t) {
                     msg = null;
-                    stremResponded = true;
+                    streamResponded = true;
                     lock.notify();
                 }
 
                 @Override
                 public void onCompleted() {
                     msg = null;
-                    stremResponded = true;
+                    streamResponded = true;
                     reqStreamObserver = null;
 
                 }
@@ -247,11 +242,11 @@ public class Transaction extends GrpcClient {
         if (reqStreamObserver == null) {
             reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);
         }
-        stremResponded = false;
+        streamResponded = false;
         reqStreamObserver.onNext(sr);
 
         synchronized (lock) {
-            while (!stremResponded) {
+            while (!streamResponded) {
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {
