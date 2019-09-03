@@ -51,6 +51,8 @@ public class Transaction extends GrpcClient {
     private final Object lock = new Object();
     private Boolean streamResponded = false;
 
+    private boolean visbilityExp;
+
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
         this.queue = queue;
         this._kubemqAddress = queue.getServerAddress();
@@ -69,8 +71,9 @@ public class Transaction extends GrpcClient {
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
             throws ServerAddressNotSuppliedException, IOException {
         if (msg != null) {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
         }
+        visbilityExp =false;
         Kubemq.StreamQueueMessagesResponse resp;
         OpenStream();
 
@@ -93,7 +96,7 @@ public class Transaction extends GrpcClient {
      */
     public TransactionMessagesResponse AckMessage() throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -115,7 +118,7 @@ public class Transaction extends GrpcClient {
      */
     public TransactionMessagesResponse RejectMessage() throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -139,7 +142,7 @@ public class Transaction extends GrpcClient {
     public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
             throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+            return new TransactionMessagesResponse("No Active queue message, visability expired"+visbilityExp, null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -163,12 +166,13 @@ public class Transaction extends GrpcClient {
      */
     public TransactionMessagesResponse ReSend(String queueName) throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
         resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
                 .setChannel(queueName).setRequestID(IDGenerator.Getid())
+                
                 .setStreamRequestTypeData(Kubemq.StreamRequestType.ResendMessage).build());
 
         return new TransactionMessagesResponse(resp);
@@ -185,7 +189,7 @@ public class Transaction extends GrpcClient {
      */
     public TransactionMessagesResponse Modify(Message message) throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("active queue message wait for ack/reject", null, null);
+            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -207,7 +211,11 @@ public class Transaction extends GrpcClient {
                 public void onNext(StreamQueueMessagesResponse value) {
                     synchronized (lock) {
                         if (value.getIsError()) {
-                            msg = value;
+                            if(value.getError().contains("Error 129")){
+                                msg = null;
+                                visbilityExp =true;
+                             }
+                         
                         } else {
                             msg = value;
                         }

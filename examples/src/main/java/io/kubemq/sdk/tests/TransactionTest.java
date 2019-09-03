@@ -29,7 +29,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import javax.net.ssl.SSLException;
 
@@ -37,6 +36,7 @@ import org.junit.Test;
 
 import io.kubemq.sdk.Queue.Message;
 import io.kubemq.sdk.Queue.Queue;
+import io.kubemq.sdk.Queue.ReceiveMessagesResponse;
 import io.kubemq.sdk.Queue.Transaction;
 import io.kubemq.sdk.Queue.TransactionMessagesResponse;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
@@ -44,7 +44,7 @@ import io.kubemq.sdk.tools.Converter;
 
 public class TransactionTest {
 
-    @Test
+ //  @Test
     public void Recive_NoMessages_Test() throws ServerAddressNotSuppliedException, IOException {
         Queue queue = createQueue("rec");
         ackQueue(queue);
@@ -56,7 +56,7 @@ public class TransactionTest {
 
     }
 
-    @Test
+ //  @Test
     public void Recive_1Messages_Ack_Test() throws ServerAddressNotSuppliedException, IOException {
         Queue queue = createQueue("1Messages");
         ackQueue(queue);
@@ -71,6 +71,53 @@ public class TransactionTest {
         assertFalse(resp.getIsError());
     }
 
+  //  @Test
+    public void Recive_VisabilityExpire_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
+        Queue queue = createQueue("Visability");
+        ackQueue(queue);
+        queue.SendQueueMessage(new Message(Converter.ToByteArray("hi"), "", "1", null));
+        Transaction tran = queue.CreateTransaction();
+        TransactionMessagesResponse resp = tran.Receive(2, 1);
+
+        assertEquals("1", resp.getMessage().getMessageID());
+        Thread.sleep(2000);  
+        resp = tran.AckMessage();
+        assertTrue(resp.getIsError());
+    }
+
+   // @Test
+    public void Recive_VisabilityExtend_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
+        Queue queue = createQueue("VisabilityExt");
+        ackQueue(queue);
+        queue.SendQueueMessage(new Message(Converter.ToByteArray("hi"), "", "1", null));
+        Transaction tran = queue.CreateTransaction();
+        TransactionMessagesResponse resp = tran.Receive(1, 1);
+        assertEquals("1", resp.getMessage().getMessageID());
+        resp = tran.ExtendVisibility(2);
+        assertFalse(resp.getIsError());
+        Thread.sleep(1000);
+        resp = tran.AckMessage();
+        assertFalse(resp.getIsError());
+    }
+
+    @Test
+    public void Recive_Resend_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
+        Queue queue = createQueue("Resend");
+        ackQueue(queue);
+        queue.SendQueueMessage(new Message(Converter.ToByteArray("hi"), "", "1", null));
+        Transaction tran = queue.CreateTransaction();
+        TransactionMessagesResponse resp = tran.Receive(3, 1);
+        assertEquals("1", resp.getMessage().getMessageID());
+        resp = tran.ReSend("Resend2");
+        assertFalse(resp.getIsError());
+      
+        Queue  queue2 = createQueue("Resend2");
+         
+        ReceiveMessagesResponse respe = queue2.PeekQueueMessage(1, 1);
+         assertEquals(1, respe.getMessagesReceived());
+
+    }
+
     private void ackQueue(Queue queue) throws SSLException, ServerAddressNotSuppliedException {
         queue.AckAllQueueMessages();
     }
@@ -79,7 +126,7 @@ public class TransactionTest {
         if (queueName == null) {
             queueName = "testQueue";
         }
-        return new Queue(queueName, "JavaTester", 1, 10, "localhost:50000");
+        return new Queue(queueName, "JavaTester", 1, 1, "localhost:50000");
 
     }
 }
