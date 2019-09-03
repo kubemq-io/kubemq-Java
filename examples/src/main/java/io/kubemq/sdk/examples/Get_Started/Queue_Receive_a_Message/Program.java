@@ -23,25 +23,22 @@
  */
 package io.kubemq.sdk.examples.Get_Started.Queue_Receive_a_Message;
 
+import java.io.IOException;
+
+import javax.net.ssl.SSLException;
+
 import io.kubemq.sdk.Queue.Message;
 import io.kubemq.sdk.Queue.Queue;
 import io.kubemq.sdk.Queue.ReceiveMessagesResponse;
-import io.kubemq.sdk.Queue.SendMessageResult;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
-import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.tools.Converter;
-
-import javax.net.ssl.SSLException;
-import java.io.IOException;
 
 public class Program {
 
-    public static void main(String[] args) throws ServerAddressNotSuppliedException {
+    public static void main(String[] args) throws ServerAddressNotSuppliedException, ClassNotFoundException {
         
         
-        String queueName = "hello-world-queue";
-        String clientID = "test-queue-client-id2";
-        String kubeMQServerAddress = "localhost:50000";
+        String queueName = "hello-world-queue", clientID = "test-queue-client-id2", kubeMQServerAddress = "localhost:50000";
 
 
         Queue queue = null;
@@ -65,7 +62,7 @@ public class Program {
 
           for (Message msg : res.getMessages()) {              
         
-            System.out.println("MessageID: {item.MessageID}, Body:{KubeMQ.SDK.csharp.Tools.Converter.FromByteArray(item.Body)}");
+            System.out.printf("MessageID:%s, Body:%s",msg.getMessageID(), Converter.FromByteArray(msg.getBody()));
           }
           
 

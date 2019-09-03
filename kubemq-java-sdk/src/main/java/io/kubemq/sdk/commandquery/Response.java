@@ -29,6 +29,8 @@ import io.kubemq.sdk.tools.Converter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class Response {
@@ -74,10 +76,13 @@ public class Response {
      */
     private String replyChannel;
 
+	private Map<String, String> tags;
+
     public Response(RequestReceive request) {
         requestID = request.getRequestId();
         replyChannel = request.getReplyChannel();
         setTimestamp(LocalDateTime.now(ZoneOffset.UTC));
+        tags= request.getTags();
     }
 
     public Response(Kubemq.Response inner) {
@@ -90,6 +95,7 @@ public class Response {
         timestamp = Converter.FromUnixTime(inner.getTimestamp());
         executed = inner.getExecuted();
         error = inner.getError();
+        tags= inner.getTagsMap();
     }
 
     Kubemq.Response Convert() {
@@ -103,6 +109,7 @@ public class Response {
                 .setTimestamp(Converter.ToUnixTime(timestamp))
                 .setExecuted(executed)
                 .setError(Optional.ofNullable(error).orElse(""))
+                .putAllTags(Optional.ofNullable(tags).orElse(new HashMap<String,String>()))
                 .build();
     }
 
@@ -177,6 +184,10 @@ public class Response {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public Map<String,String> getTags(){
+        return this.tags;
     }
 
 }

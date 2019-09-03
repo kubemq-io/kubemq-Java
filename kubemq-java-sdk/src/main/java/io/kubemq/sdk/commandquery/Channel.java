@@ -191,6 +191,7 @@ public class Channel {
         innerRequest.setRequestId(request.getRequestId());
         innerRequest.setBody(request.getBody());
         innerRequest.setMetadata(request.getMetadata());
+        innerRequest.setTags(request.getTags());
 
         return innerRequest;
     }

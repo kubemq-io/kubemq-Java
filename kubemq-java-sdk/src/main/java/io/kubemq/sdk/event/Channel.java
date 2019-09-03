@@ -156,8 +156,9 @@ public class Channel {
                 notification.getMetadata(),
                 notification.getBody(),
                 notification.getEventId(),
-                getClientID(),
-                isStore()
+                getClientID(),              
+                isStore(),
+                notification.getTags()
         );
     }
 

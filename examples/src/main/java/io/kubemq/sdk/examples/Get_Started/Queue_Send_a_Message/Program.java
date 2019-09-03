@@ -38,10 +38,7 @@ public class Program {
     public static void main(String[] args) throws ServerAddressNotSuppliedException {
         
         
-        String queueName = "hello-world-queue";
-        String clientID = "test-queue-client-id2";
-        String kubeMQServerAddress = "localhost:50000";
-
+        String queueName = "hello-world-queue", clientID = "test-queue-client-id2", kubeMQServerAddress = "localhost:50000";
 
         Queue queue = null;
         try{

@@ -23,6 +23,9 @@
  */
 package io.kubemq.sdk.commandquery;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.kubemq.sdk.grpc.Kubemq;
 
 public class RequestReceive {
@@ -77,6 +80,8 @@ public class RequestReceive {
      */
     private int cacheTTL;
 
+	private Map<String, String> tags;
+
     RequestReceive(Kubemq.Request innerRequest) {
         setRequestId(innerRequest.getRequestID());
         setRequestType(RequestType.values()[(innerRequest.getRequestTypeDataValue())]);
@@ -88,6 +93,7 @@ public class RequestReceive {
         setTimeout(innerRequest.getTimeout());
         setCacheKey(innerRequest.getCacheKey());
         setCacheTTL(innerRequest.getCacheTTL());
+        tags = innerRequest.getTagsMap();
     }
 
     public String getRequestId() {
@@ -168,5 +174,14 @@ public class RequestReceive {
 
     public void setCacheTTL(int cacheTTL) {
         this.cacheTTL = cacheTTL;
+    }
+    public Map<String, String> getTags() {
+        return this.tags;
+    }
+    public void setTag(String key, String value){
+        if (tags==null){
+            tags =  new HashMap<String,String>();
+        }
+        this.tags.putIfAbsent(key, value);
     }
 }

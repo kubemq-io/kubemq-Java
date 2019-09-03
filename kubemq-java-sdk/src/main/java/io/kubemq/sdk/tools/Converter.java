@@ -106,14 +106,7 @@ public class Converter {
         return x;
     }
 
-    // public static Iterable<? extends Message> FromQueueMessages(Iterable<Kubemq.QueueMessage> queueMessages){
-    //     Collection<Message> cltn = new ArrayList<Message>(); 
-    //     for (Kubemq.QueueMessage queueMessage : queueMessages) {
-    //         cltn.add(new Message(queueMessage));
-    //     }
-    //     return cltn;
-    // }
- 
+  
     public static Iterable<? extends Kubemq.QueueMessage> ToQueueMessages(Iterable<Message> queueMessages, String clientID,
     String queueName) {
         Collection<Kubemq.QueueMessage> cltn = new ArrayList<Kubemq.QueueMessage>(); 

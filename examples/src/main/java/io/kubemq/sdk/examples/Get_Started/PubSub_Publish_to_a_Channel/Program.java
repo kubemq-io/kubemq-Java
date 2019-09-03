@@ -21,62 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.event;
+package io.kubemq.sdk.examples.Get_Started.PubSub_Publish_to_a_Channel;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
-public class Event {
-    private String eventId;
-    private String metadata;
-    private byte[] body;
-    private Map<String,String> tags;
+import javax.net.ssl.SSLException;
 
-  
-    public Event() {
-    }
+import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
+import io.kubemq.sdk.event.Event;
+import io.kubemq.sdk.event.Result;
+import io.kubemq.sdk.tools.Converter;
 
- 
-    public Event(String eventId, String metadata, byte[] body) {
-        this.eventId = eventId;
-        this.metadata = metadata;
-        this.body = body;
-    }
+public class Program {
 
-   
-    public String getEventId() {
-        return eventId;
-    }
-
+    public static void main(String[] args)  {
+        
+        String channelName = "testing_event_channel", clientID = "hello-world-subscriber", kubeMQAddress = "localhost:50000";
     
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
+        io.kubemq.sdk.event.Channel chan = new io.kubemq.sdk.event.Channel(channelName, clientID, false, kubeMQAddress);
 
-    public String getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
-
-    public byte[] getBody() {
-        return body;
-    }
-
-    public void setBody(byte[] body) {
-        this.body = body;
-    }
-
-    public Map<String, String> getTags() {
-        return this.tags;
-    }
-    public void setTag(String key, String value){
-        if (tags==null){
-            tags =  new HashMap<String,String>();
+        Event event = new Event();
+        try {
+            event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        this.tags.putIfAbsent(key, value);
-    }
+        
+        try {
+            Result res = chan.SendEvent(event);
+        } catch (SSLException | ServerAddressNotSuppliedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
+    }
 }
