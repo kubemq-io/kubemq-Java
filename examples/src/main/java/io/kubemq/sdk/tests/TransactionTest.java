@@ -24,6 +24,7 @@
 
 package io.kubemq.sdk.tests;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -100,7 +101,7 @@ public class TransactionTest {
         assertFalse(resp.getIsError());
     }
 
-    @Test
+  //  @Test
     public void Recive_Resend_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
         Queue queue = createQueue("Resend");
         ackQueue(queue);
@@ -115,8 +116,37 @@ public class TransactionTest {
          
         ReceiveMessagesResponse respe = queue2.PeekQueueMessage(1, 1);
          assertEquals(1, respe.getMessagesReceived());
-
     }
+
+    @Test
+    public void Recive_Modify_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
+        Queue queue = createQueue("Modify");
+        ackQueue(queue);
+        queue.SendQueueMessage(new Message(Converter.ToByteArray("hi"), "", "1", null));
+        Transaction tran = queue.CreateTransaction();
+        TransactionMessagesResponse resp = tran.Receive(3, 1);
+        assertEquals("1", resp.getMessage().getMessageID());
+        Message msg = resp.getMessage();
+        msg.setBody(Converter.ToByteArray("well hello"))
+        .setQueue(queue.getQueueName());
+
+        resp = tran.Modify(msg);
+        assertFalse(resp.getError(),  resp.getIsError());
+  
+        ReceiveMessagesResponse respe = queue.PeekQueueMessage(3, 1);  
+        byte[] b = respe.getMessages().iterator().next().getBody();
+        try {
+            String xString = Converter.FromByteArray(b).toString();
+            System.out.println(xString);
+            System.out.println(Converter.FromByteArray(msg.getBody()));
+
+        } catch (ClassNotFoundException e) {
+           
+            e.printStackTrace();
+        }
+        assertArrayEquals(msg.getBody(), b);
+    }
+
 
     private void ackQueue(Queue queue) throws SSLException, ServerAddressNotSuppliedException {
         queue.AckAllQueueMessages();
