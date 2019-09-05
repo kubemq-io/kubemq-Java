@@ -45,7 +45,7 @@ import io.kubemq.sdk.tools.Converter;
 
 public class TransactionTest {
 
- //  @Test
+  @Test
     public void Recive_NoMessages_Test() throws ServerAddressNotSuppliedException, IOException {
         Queue queue = createQueue("rec");
         ackQueue(queue);
@@ -57,7 +57,7 @@ public class TransactionTest {
 
     }
 
- //  @Test
+  @Test
     public void Recive_1Messages_Ack_Test() throws ServerAddressNotSuppliedException, IOException {
         Queue queue = createQueue("1Messages");
         ackQueue(queue);
@@ -72,7 +72,7 @@ public class TransactionTest {
         assertFalse(resp.getIsError());
     }
 
-  //  @Test
+    @Test
     public void Recive_VisabilityExpire_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
         Queue queue = createQueue("Visability");
         ackQueue(queue);
@@ -86,7 +86,7 @@ public class TransactionTest {
         assertTrue(resp.getIsError());
     }
 
-   // @Test
+    @Test
     public void Recive_VisabilityExtend_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
         Queue queue = createQueue("VisabilityExt");
         ackQueue(queue);
@@ -101,7 +101,7 @@ public class TransactionTest {
         assertFalse(resp.getIsError());
     }
 
-  //  @Test
+    @Test
     public void Recive_Resend_Test() throws ServerAddressNotSuppliedException, IOException, InterruptedException {
         Queue queue = createQueue("Resend");
         ackQueue(queue);

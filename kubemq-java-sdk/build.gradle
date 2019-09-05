@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
+
     }
 }
 
@@ -11,9 +12,13 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
     id "com.google.protobuf" version "0.8.6"
     id 'java'
+
 }
 
+
 apply plugin: 'idea'
+
+
 
 
 sourceCompatibility = 1.8
