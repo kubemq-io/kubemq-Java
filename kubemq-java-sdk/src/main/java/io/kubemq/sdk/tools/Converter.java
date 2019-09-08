@@ -30,7 +30,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import io.kubemq.sdk.Queue.Message;
+import io.kubemq.sdk.queue.Message;
 import io.kubemq.sdk.grpc.Kubemq;
 
 /**
@@ -88,43 +88,7 @@ public class Converter {
     public static long ToUnixTime(LocalDateTime timestamp) {
         return timestamp.atZone(TimeZone.getDefault().toZoneId()).toInstant().toEpochMilli();
     }
-
-    public static Kubemq.QueueMessage ConvertQueueMessage(Message r)
-    {
-        Kubemq.QueueMessage x =  Kubemq.QueueMessage.newBuilder()
-        .setAttributes(r.getQueueMessageAttributes())
-        .setBody(ToByteString(r.getBody()))
-        .setChannel(r.getQueue())
-        .setClientID(r.getClientID())
-        .setMessageID(r.getMessageID())
-        .setMetadata(r.getMetadata())
-        .build();
-        
-        if(r.getMessagePolicy()!=null){
-            x.newBuilderForType().setPolicy(r.getMessagePolicy()).build();
-        }
-        return x;
-    }
-
   
-    public static Iterable<? extends Kubemq.QueueMessage> ToQueueMessages(Iterable<Message> queueMessages, String clientID,
-    String queueName) {
-        Collection<Kubemq.QueueMessage> cltn = new ArrayList<Kubemq.QueueMessage>(); 
-
-            for (Message item : queueMessages){
-               if (item.getQueue()==null)
-                {
-                    item.setQueue(queueName);
-                }
-                
-                if (item.getClientID()==null)
-                {
-                    item.setClientID(clientID);
-                }      
-                cltn.add(ConvertQueueMessage(item)); 
-        }
-            return cltn;
-}
 
 	
 

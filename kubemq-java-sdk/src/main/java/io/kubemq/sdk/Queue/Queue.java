@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.Queue;
+package io.kubemq.sdk.queue;
 
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
@@ -32,6 +32,10 @@ import io.kubemq.sdk.tools.IDGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.net.ssl.SSLException;
 
 /**
@@ -137,7 +141,7 @@ public class Queue extends GrpcClient {
         Kubemq.QueueMessagesBatchResponse rec = GetKubeMQClient()
                 .sendQueueMessagesBatch(Kubemq.QueueMessagesBatchRequest.newBuilder().setBatchID(IDGenerator.Getid())
                         .addAllMessages(
-                                Converter.ToQueueMessages(queueMessages, this.getClientID(), this.getQueueName()))
+                            toQueueMessages(queueMessages))
                         .build());
 
         return new SendBatchMessageResult(rec);
@@ -239,7 +243,7 @@ public class Queue extends GrpcClient {
      *                                           determined.
      */
     public Kubemq.PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
-        Kubemq.PingResult rec = GetKubeMQClient().ping(Kubemq.Empty.newBuilder().build());
+        Kubemq.PingResult rec = GetKubeMQClient().ping(null);
         logger.debug("Queue KubeMQ address: '{}' ,ping result: '{}'", _kubemqAddress, rec);
         return rec;
 
@@ -303,5 +307,24 @@ public class Queue extends GrpcClient {
         }
         return transaction;
     }
+
+    private  Iterable<? extends Kubemq.QueueMessage> toQueueMessages(Iterable<Message> queueMessages) {
+        Collection<Kubemq.QueueMessage> cltn = new ArrayList<Kubemq.QueueMessage>(); 
+
+            for (Message item : queueMessages){
+               if (item.getQueue()==null)
+                {
+                    item.setQueue(this.queueName);
+                }
+                
+                if (item.getClientID()==null)
+                {
+                    item.setClientID(this.clientID);
+                }      
+                cltn.add(item.toQueueMessage()); 
+        }
+            return cltn;
+}
+
 
 }

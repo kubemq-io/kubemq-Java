@@ -54,7 +54,7 @@ public class Program {
                 System.out.printf("Response error: %s", result.getError());
                 return;
             }
-            System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
+            System.out.printf("Response Received: %s, ExecutedAt: %s", result.getRequestID(), result.getTimestamp().toString());
         } catch (ServerAddressNotSuppliedException e) {
             System.out.printf("ServerAddressNotSuppliedException: %s", e.toString());
             e.printStackTrace();

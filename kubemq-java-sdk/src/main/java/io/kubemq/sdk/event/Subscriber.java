@@ -26,6 +26,7 @@ package io.kubemq.sdk.event;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
+import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.kubemq.sdk.subscription.EventsStoreType;
 import io.kubemq.sdk.subscription.SubscribeRequest;
 import io.kubemq.sdk.subscription.SubscribeType;
@@ -42,8 +43,8 @@ public class Subscriber extends GrpcClient {
     private static Logger logger = LoggerFactory.getLogger(Subscriber.class);
 
     /**
-     * Initialize a new Subscriber to incoming messages
-     * KubeMQAddress will be parsed from Config or environment parameter
+     * Initialize a new Subscriber to incoming messages KubeMQAddress will be parsed
+     * from Config or environment parameter
      */
     public Subscriber() {
         this(null);
@@ -62,15 +63,21 @@ public class Subscriber extends GrpcClient {
      * Register to kubeMQ Channel using io.kubemq.sdk.Subscription.SubscribeRequest.
      * This method is blocking.
      *
-     * @param subscribeRequest Parameters list represent by io.kubemq.sdk.Subscription.SubscribeRequest
-     *                         that will determine the subscription configuration.
+     * @param subscribeRequest Parameters list represent by
+     *                         io.kubemq.sdk.Subscription.SubscribeRequest that will
+     *                         determine the subscription configuration.
      * @return io.kubemq.sdk.PubSub.MessageReceive.
-     * @throws ServerAddressNotSuppliedException Thrown exception when KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException Thrown exception when KubeMQ server
+     *                                           address can not be determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public EventReceive SubscribeToEvents(SubscribeRequest subscribeRequest) throws ServerAddressNotSuppliedException, SSLException {
+    public EventReceive SubscribeToEvents(SubscribeRequest subscribeRequest)
+            throws ServerAddressNotSuppliedException, SSLException {
 
         ValidateSubscribeRequest(subscribeRequest);
+
+        this.Ping();
 
         Iterator<Kubemq.EventReceive> call = GetKubeMQClient()
                 .subscribeToEvents(subscribeRequest.ToInnerSubscribeRequest());
@@ -83,22 +90,44 @@ public class Subscriber extends GrpcClient {
         return null;
     }
 
+   /**
+     * Ping check Kubemq response.
+     * 
+     * @return PingResult
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
+    public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+        return GetKubeMQClient().ping(null);
+    }
+
     /**
      * Register to kubeMQ Channel using io.kubemq.sdk.Subscription.SubscribeRequest.
      * This method is async.
      *
-     * @param subscribeRequest Parameters list represent by io.kubemq.sdk.Subscription.SubscribeRequest
-     *                         that will determine the subscription configuration.
+     * @param subscribeRequest Parameters list represent by
+     *                         io.kubemq.sdk.Subscription.SubscribeRequest that will
+     *                         determine the subscription configuration.
      * @param streamObserver   Async StreamObserver to handle queue messages
-     * @throws ServerAddressNotSuppliedException Thrown exception when KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException Thrown exception when KubeMQ server
+     *                                           address can not be determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
     public void SubscribeToEvents(
             SubscribeRequest subscribeRequest,
             StreamObserver<EventReceive> streamObserver
     ) throws ServerAddressNotSuppliedException, SSLException {
 
+        ValidateSubscribeRequest(subscribeRequest);
+
+       
         Kubemq.Subscribe innerSubscribeRequest = subscribeRequest.ToInnerSubscribeRequest();
+        this.Ping();
+        
+
         StreamObserver<Kubemq.EventReceive> observer = new StreamObserver<Kubemq.EventReceive>() {
             @Override
             public void onNext(Kubemq.EventReceive messageReceive) {

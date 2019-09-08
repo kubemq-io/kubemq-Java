@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.Queue;
+package io.kubemq.sdk.queue;
 
 import com.google.protobuf.ByteString;
 import io.kubemq.sdk.grpc.Kubemq;
@@ -214,6 +214,9 @@ public class Message {
    * @return this Message
    */
   public Message setMaxReciveCount(int maxReciveCount) {
+    if (this.policy==null){
+      this.policy = QueueMessagePolicy.getDefaultInstance();
+    }
     this.policy.newBuilderForType().setMaxReceiveCount(maxReciveCount).build();
     return this;
   }
@@ -225,6 +228,9 @@ public class Message {
    * @return this Message
    */
   public Message setMaxReciveQueue(String maxReciveQueue) {
+    if (this.policy==null){
+      this.policy = QueueMessagePolicy.getDefaultInstance();
+    }
     this.policy.newBuilderForType().setMaxReceiveQueue(maxReciveQueue).build();
     return this;
   }
@@ -236,6 +242,9 @@ public class Message {
    * @return this Message
    */
   public Message setExpiration(int expiration) {
+    if (this.policy==null){
+      this.policy = QueueMessagePolicy.getDefaultInstance();
+    }
     this.policy.newBuilderForType().setExpirationSeconds(expiration).build();
     return this;
   }
@@ -247,6 +256,9 @@ public class Message {
    * @return this Message
    */
   public Message setDelay(int delay) {
+    if (this.policy==null){
+      this.policy = QueueMessagePolicy.getDefaultInstance();
+    }
     this.policy.newBuilderForType().setDelaySeconds(delay).build();
     return this;
   }
@@ -254,7 +266,9 @@ public class Message {
   protected QueueMessage toQueueMessage() {
     Kubemq.QueueMessage tempmsg = Kubemq.QueueMessage.newBuilder()
         .setMessageID(this.messageID == null ? IDGenerator.Getid() : this.getMessageID()).setClientID(this.clientID)
-        .setChannel(this.queueName).setBody(ByteString.copyFrom(this.body)).setMetadata(this.metadata).build();
+        .setChannel(this.queueName).setBody(ByteString.copyFrom(this.body))
+        .setMetadata(this.metadata==null ? "" : this.metadata )
+        .build();
     if (this.policy != null) {
       tempmsg.newBuilderForType().setPolicy(this.policy).build();
     }

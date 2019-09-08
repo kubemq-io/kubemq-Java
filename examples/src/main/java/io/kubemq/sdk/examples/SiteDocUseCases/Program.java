@@ -31,14 +31,14 @@ import java.util.Collection;
 import javax.net.ssl.SSLException;
 
 import io.grpc.stub.StreamObserver;
-import io.kubemq.sdk.Queue.AckAllMessagesResponse;
-import io.kubemq.sdk.Queue.Message;
-import io.kubemq.sdk.Queue.Queue;
-import io.kubemq.sdk.Queue.ReceiveMessagesResponse;
-import io.kubemq.sdk.Queue.SendBatchMessageResult;
-import io.kubemq.sdk.Queue.SendMessageResult;
-import io.kubemq.sdk.Queue.Transaction;
-import io.kubemq.sdk.Queue.TransactionMessagesResponse;
+import io.kubemq.sdk.queue.AckAllMessagesResponse;
+import io.kubemq.sdk.queue.Message;
+import io.kubemq.sdk.queue.Queue;
+import io.kubemq.sdk.queue.ReceiveMessagesResponse;
+import io.kubemq.sdk.queue.SendBatchMessageResult;
+import io.kubemq.sdk.queue.SendMessageResult;
+import io.kubemq.sdk.queue.Transaction;
+import io.kubemq.sdk.queue.TransactionMessagesResponse;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Request;
 import io.kubemq.sdk.commandquery.RequestType;
@@ -88,7 +88,7 @@ public class Program {
         Queries_Receiving_Query_Requests();
         Queries_Sending_Query_Request();
         Queries_Sending_Query_Request_async();
-       
+
         try {
             int read = System.in.read();
         } catch (IOException e) {
@@ -185,8 +185,8 @@ public class Program {
             if (resSend.getIsError()) {
                 System.out.printf("Message enqueue error, error: %s", resSend.getError());
             } else {
-                System.out.printf("Send to Queue Result: MessageID: %s, Sent At:%t", resSend.getMessageID(),
-                        Converter.FromUnixTime(resSend.getSentAt()));
+                System.out.printf("Send to Queue Result: MessageID: %s, Sent At:%s", resSend.getMessageID(),
+                      Converter.FromUnixTime(resSend.getSentAt()).toString());
 
             }
 
@@ -217,7 +217,7 @@ public class Program {
         }
         System.out.printf("Received Messages: %s", resPek.getMessagesReceived());
         for (Message msg : resPek.getMessages()) {
-            System.out.printf("MessageID: %d, Body: %s", msg.getMessageID(), Converter.FromByteArray(msg.getBody()));
+            System.out.printf("MessageID: %s, Body: %s", msg.getMessageID(), Converter.FromByteArray(msg.getBody()));
         }
     }
 
@@ -233,7 +233,6 @@ public class Program {
 
     }
 
-  
     private static void Transactional_Queue_Ack()
             throws ServerAddressNotSuppliedException, InterruptedException, ClassNotFoundException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
@@ -348,7 +347,6 @@ public class Program {
 
     }
 
-   
     private static void Receiving_Events() throws SSLException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_event_channel", ClientID = "hello-world-subscriber",
                 KubeMQServerAddress = "localhost:50000";
@@ -367,10 +365,10 @@ public class Program {
                             value.getEventId(), value.getChannel(), value.getMetadata(),
                             Converter.FromByteArray(value.getBody()));
                 } catch (ClassNotFoundException e) {
-                    System.out.printf("ClassNotFoundException: %s",e.getMessage());
+                    System.out.printf("ClassNotFoundException: %s", e.getMessage());
                     e.printStackTrace();
                 } catch (IOException e) {
-                    System.out.printf("IOException:  %s",e.getMessage());
+                    System.out.printf("IOException:  %s", e.getMessage());
                     e.printStackTrace();
                 }
 
@@ -403,7 +401,7 @@ public class Program {
 
             @Override
             public void onNext(Result value) {
-                System.out.printf("Sent event: %s",value.getEventId());
+                System.out.printf("Sent event: %s", value.getEventId());
             }
 
             @Override
@@ -429,7 +427,7 @@ public class Program {
         io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, false,
                 KubeMQServerAddress);
         Event event = new Event();
-        event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));    
+        event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
         Result result;
         try {
             result = channel.SendEvent(event);
@@ -438,13 +436,12 @@ public class Program {
                 return;
             }
         } catch (ServerAddressNotSuppliedException e) {
-            System.out.printf("Could not send single message: %s",e.getMessage());
+            System.out.printf("Could not send single message: %s", e.getMessage());
             e.printStackTrace();
         }
 
     }
 
-   
     private static void Receiving_Events_Store() throws SSLException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_event_channel", ClientID = "hello-world-subscriber",
                 KubeMQServerAddress = "localhost:50000";
@@ -453,7 +450,7 @@ public class Program {
         subscribeRequest.setChannel(ChannelName);
         subscribeRequest.setClientID(ClientID);
         subscribeRequest.setSubscribeType(SubscribeType.EventsStore);
-        subscribeRequest.setEventsStoreType(EventsStoreType.StartFromFirst);
+        subscribeRequest.setEventsStoreType(EventsStoreType.StartAtSequence);
 
         StreamObserver<EventReceive> streamObserver = new StreamObserver<EventReceive>() {
 
@@ -464,24 +461,24 @@ public class Program {
                             value.getEventId(), value.getChannel(), value.getMetadata(),
                             Converter.FromByteArray(value.getBody()));
                 } catch (ClassNotFoundException e) {
-                    System.out.printf("ClassNotFoundException: %s",e.getMessage());
+                    System.out.printf("ClassNotFoundException: %s", e.getMessage());
                     e.printStackTrace();
                 } catch (IOException e) {
-                    System.out.printf("IOException: %s",e.getMessage());
+                    System.out.printf("IOException: %s", e.getMessage());
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onError(Throwable t) {
-                System.out.printf("onError:  %s",t.getMessage());
+                System.out.printf("onError:  %s", t.getMessage());
             }
 
             @Override
             public void onCompleted() {
 
             }
-       
+
         };
         subscriber.SubscribeToEvents(subscribeRequest, streamObserver);
 
@@ -499,7 +496,7 @@ public class Program {
 
             @Override
             public void onNext(Result value) {
-                System.out.printf("Stream event: %s",value.getEventId());
+                System.out.printf("Stream event: %s", value.getEventId());
             }
 
             @Override
@@ -534,19 +531,18 @@ public class Program {
             event.setBody(Converter.ToByteArray("hello kubemq - sending single event"));
             event.setEventId("event-Store-" + i);
             try {
-              channel.SendEvent(event);
+                channel.SendEvent(event);
             } catch (SSLException e) {
-                System.out.printf("SSLException: %s",e.getMessage());
+                System.out.printf("SSLException: %s", e.getMessage());
                 e.printStackTrace();
             } catch (ServerAddressNotSuppliedException e) {
-                System.out.printf("ServerAddressNotSuppliedException: %s",e.getMessage());
+                System.out.printf("ServerAddressNotSuppliedException: %s", e.getMessage());
                 e.printStackTrace();
             }
         }
 
     }
-   
-  
+
     private static void Commands_Receiving_Commands_Requests() throws SSLException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
@@ -573,7 +569,7 @@ public class Program {
             public void run() {
                 try {
                     responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
-               } catch (SSLException e) {
+                } catch (SSLException e) {
                     System.out.printf("SSLException:%s", e.getMessage());
                     e.printStackTrace();
                 } catch (ServerAddressNotSuppliedException e) {
@@ -584,7 +580,7 @@ public class Program {
         }.start();
 
     }
-   
+
     private static void Commands_Sending_Command_Request() throws IOException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
@@ -640,7 +636,6 @@ public class Program {
 
     }
 
-  
     private static void Queries_Receiving_Query_Requests() throws SSLException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
@@ -679,7 +674,7 @@ public class Program {
         }.start();
 
     }
-    
+
     private static void Queries_Sending_Query_Request() throws IOException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
@@ -700,7 +695,7 @@ public class Program {
         }
         System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
     }
-   
+
     private static void Queries_Sending_Query_Request_async() throws IOException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
@@ -728,7 +723,7 @@ public class Program {
 
             @Override
             public void onError(Throwable t) {
-                System.out.printf("onError: %s",t.getMessage());
+                System.out.printf("onError: %s", t.getMessage());
             }
 
             @Override
@@ -739,5 +734,4 @@ public class Program {
         channel.SendRequestAsync(request, response);
     }
 
-    
-   }
+}

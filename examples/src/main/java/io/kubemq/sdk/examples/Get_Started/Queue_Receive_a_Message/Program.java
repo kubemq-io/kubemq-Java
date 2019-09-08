@@ -27,9 +27,9 @@ import java.io.IOException;
 
 import javax.net.ssl.SSLException;
 
-import io.kubemq.sdk.Queue.Message;
-import io.kubemq.sdk.Queue.Queue;
-import io.kubemq.sdk.Queue.ReceiveMessagesResponse;
+import io.kubemq.sdk.queue.Message;
+import io.kubemq.sdk.queue.Queue;
+import io.kubemq.sdk.queue.ReceiveMessagesResponse;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.tools.Converter;
 
@@ -43,7 +43,7 @@ public class Program {
 
         Queue queue = null;
         try{
-            queue = new io.kubemq.sdk.Queue.Queue(queueName,clientID,1,2,kubeMQServerAddress);
+            queue = new io.kubemq.sdk.queue.Queue(queueName,clientID,1,2,kubeMQServerAddress);
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");
         } catch (io.grpc.StatusRuntimeException e) {

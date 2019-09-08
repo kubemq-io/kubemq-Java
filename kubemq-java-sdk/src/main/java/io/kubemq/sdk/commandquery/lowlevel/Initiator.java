@@ -27,11 +27,16 @@ import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Response;
 import io.kubemq.sdk.grpc.Kubemq;
+import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
+
+import com.google.protobuf.Empty;
+
+
 
 /**
  * Represents the instance that is responsible to send requests to the kubemq.
@@ -112,5 +117,18 @@ public class Initiator extends GrpcClient {
                 request.getReplyChannel()
         );
     }
+
+    /**
+     * Ping check Kubemq response.
+     * 
+     * @return PingResult
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
+	public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+	return GetKubeMQClient().ping(null);
+	}
 
 }

@@ -25,6 +25,7 @@ package io.kubemq.sdk.event;
 
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.lowlevel.Sender;
+import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
 
@@ -142,6 +143,19 @@ public class Channel {
                 observer.onCompleted();
             }
         };
+    }
+
+   /**
+     * Ping check Kubemq response.
+     * 
+     * @return PingResult
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
+    public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+        return sender.Ping();
     }
 
     private void isValid() {

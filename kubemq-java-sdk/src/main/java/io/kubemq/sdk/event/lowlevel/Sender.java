@@ -150,4 +150,17 @@ public class Sender extends GrpcClient {
                 response.getError()
         );
     }
+
+    /**
+     * Ping check Kubemq response.
+     * 
+     * @return PingResult
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
+	public io.kubemq.sdk.grpc.Kubemq.PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+		return GetKubeMQClient().ping(null);
+	}
 }

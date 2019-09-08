@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.SiteDocUseCases.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.Get_Started.RPC_Subscribe_to_a_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.Get_Started.RPC_Send_a_Command_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}"
