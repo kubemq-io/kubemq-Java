@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.examples.Get_Started.Queue_Send_a_Message;
+package io.kubemq.sdk.examples.get_Started.queue_Send_a_Message;
 
 import io.kubemq.sdk.queue.Message;
 import io.kubemq.sdk.queue.Queue;

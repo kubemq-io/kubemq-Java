@@ -55,3 +55,38 @@ task("eventSubscriber", dependsOn: 'classes', type: JavaExec) {
     main = 'io.kubemq.sdk.examples.eventsubscriber.Program'
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task("siteDocUseCases", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.siteDocUseCases.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("pubSub_Publish_to_a_Channel", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.get_Started.pubSub_Publish_to_a_Channel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("pubSub_Subscribe_to_a_Channel", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.get_Started.pubSub_Subscribe_to_a_Channel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("queue_Receive_a_Message", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.get_Started.queue_Receive_a_Message.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("queue_Send_a_Message", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.get_Started.queue_Send_a_Message.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("rPC_Send_a_Command_Channel", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.get_Started.rPC_Send_a_Command_Channel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task("rPC_Subscribe_to_a_Channel", dependsOn: 'classes', type: JavaExec) {
+    main = 'io.kubemq.sdk.examples.get_Started.rPC_Subscribe_to_a_Channel.Program'
+    classpath = sourceSets.main.runtimeClasspath
+}

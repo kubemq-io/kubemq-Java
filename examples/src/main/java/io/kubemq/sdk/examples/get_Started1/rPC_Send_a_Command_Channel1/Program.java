@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.examples.Get_Started.RPC_Send_a_Command_Channel;
+package io.kubemq.sdk.examples.get_Started.rPC_Send_a_Command_Channel;
 
 import java.io.IOException;
 

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.examples.Get_Started.RPC_Subscribe_to_a_Channel;
+package io.kubemq.sdk.examples.get_Started.rPC_Subscribe_to_a_Channel;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

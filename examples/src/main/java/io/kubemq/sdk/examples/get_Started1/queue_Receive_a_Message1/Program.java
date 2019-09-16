@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.examples.Get_Started.Queue_Receive_a_Message;
+package io.kubemq.sdk.examples.get_Started.queue_Receive_a_Message;
 
 import java.io.IOException;
 

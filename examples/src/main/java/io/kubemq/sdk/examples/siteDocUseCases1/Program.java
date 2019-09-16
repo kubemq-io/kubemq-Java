@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.examples.SiteDocUseCases;
+package io.kubemq.sdk.examples.siteDocUseCases;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

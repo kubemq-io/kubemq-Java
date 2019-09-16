@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.kubemq.sdk.examples.Get_Started.PubSub_Subscribe_to_a_Channel;
+package io.kubemq.sdk.examples.get_Started.pubSub_Subscribe_to_a_Channel;
 
 import java.io.IOException;
 
