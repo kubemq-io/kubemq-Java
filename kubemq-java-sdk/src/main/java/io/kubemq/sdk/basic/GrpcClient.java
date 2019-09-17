@@ -111,7 +111,7 @@ public class GrpcClient {
             getLogger().info(MessageFormat.format("constructing channel to KubeMQ on {0}", kubemqAddress));
         }
 
-        if (StringUtils.isBlank(clientCertFile)) {
+        if (!StringUtils.isBlank(clientCertFile)) {
             return NettyChannelBuilder.forTarget(kubemqAddress)
                     .sslContext(
                             GrpcSslContexts
