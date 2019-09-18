@@ -26,6 +26,7 @@ package io.kubemq.sdk.commandquery;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.lowlevel.Initiator;
 import io.kubemq.sdk.commandquery.lowlevel.Request;
+import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,33 +49,34 @@ public class Channel {
     private int cacheTTL;
 
     /**
-     * Initializes a new instance of the RequestChannel class using RequestChannelParameters.
+     * Initializes a new instance of the RequestChannel class using
+     * RequestChannelParameters.
      *
      * @param parameters Channel Parameters
      */
     public Channel(ChannelParameters parameters) {
-        this(
-                parameters.getRequestType(),
-                parameters.getChannelName(),
-                parameters.getClientID(),
-                parameters.getTimeout(),
-                parameters.getCacheKey(),
-                parameters.getCacheTTL(),
-                parameters.getKubeMQAddress()
-        );
+        this(parameters.getRequestType(), parameters.getChannelName(), parameters.getClientID(),
+                parameters.getTimeout(), parameters.getCacheKey(), parameters.getCacheTTL(),
+                parameters.getKubeMQAddress());
     }
 
     /**
-     * Initializes a new instance of the RequestChannel class using a set of parameters.
+     * Initializes a new instance of the RequestChannel class using a set of
+     * parameters.
      *
      * @param channelName   Represents The channel name to send to using the KubeMQ.
-     * @param clientId      Represents the sender ID that the Request will be send under.
-     * @param timeout       Represents the limit for waiting for response (Milliseconds).
-     * @param cacheKey      Represents if the request should be saved from Cache and under what "Key"(java.lang.String) to save it.
-     * @param cacheTTL      Cache time to live : for how long does the request should be saved in Cache
+     * @param clientId      Represents the sender ID that the Request will be send
+     *                      under.
+     * @param timeout       Represents the limit for waiting for response
+     *                      (Milliseconds).
+     * @param cacheKey      Represents if the request should be saved from Cache and
+     *                      under what "Key"(java.lang.String) to save it.
+     * @param cacheTTL      Cache time to live : for how long does the request
+     *                      should be saved in Cache
      * @param kubeMQAddress KubeMQ server address.
      */
-    public Channel(RequestType requestsType, String channelName, String clientId, int timeout, String cacheKey, int cacheTTL, String kubeMQAddress) {
+    public Channel(RequestType requestsType, String channelName, String clientId, int timeout, String cacheKey,
+            int cacheTTL, String kubeMQAddress) {
         this.requestType = requestsType;
         this.channelName = channelName;
         this.clientId = clientId;
@@ -88,15 +90,20 @@ public class Channel {
     }
 
     /**
-     * Send a single blocking request using the KubeMQ.\
-     * response will return as StreamObserver.
+     * Send a single blocking request using the KubeMQ.\ response will return as
+     * StreamObserver.
      *
-     * @param request  The io.kubemq.sdk.requestreply.lowlevel.request that will be sent to the kubeMQ.
-     * @param response StreamObserver for the response for the request that was sent.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @param request  The io.kubemq.sdk.requestreply.lowlevel.request that will be
+     *                 sent to the kubeMQ.
+     * @param response StreamObserver for the response for the request that was
+     *                 sent.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public void SendRequest(io.kubemq.sdk.commandquery.Request request, final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
+    public void SendRequest(io.kubemq.sdk.commandquery.Request request, final StreamObserver<Response> response)
+            throws ServerAddressNotSuppliedException, SSLException {
         response.onNext(_initiator.SendRequest(CreateLowLevelRequest(request)));
     }
 
@@ -104,64 +111,103 @@ public class Channel {
      * Send a single blocking request using the KubeMQ with override parameters.
      * response will return as StreamObserver.
      *
-     * @param request        The io.kubemq.sdk.requestreply.lowlevel.request that will be sent to the kubeMQ.
-     * @param overrideParams Allow overwriting "Timeout" "CacheKey" and "CacheTTL" for a single Request.
-     * @param response       StreamObserver for the response for the request that was sent.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @param request        The io.kubemq.sdk.requestreply.lowlevel.request that
+     *                       will be sent to the kubeMQ.
+     * @param overrideParams Allow overwriting "Timeout" "CacheKey" and "CacheTTL"
+     *                       for a single Request.
+     * @param response       StreamObserver for the response for the request that
+     *                       was sent.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public void SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams, final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
+    public void SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams,
+            final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
         response.onNext(_initiator.SendRequest(CreateLowLevelRequest(request, overrideParams)));
     }
 
     /**
      * Send a single async request using the KubeMQ.
      *
-     * @param request  The io.kubemq.sdk.requestreply.lowlevel.request that will be sent to the kubeMQ.
-     * @param response StreamObserver for the response for the request that was sent.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @param request  The io.kubemq.sdk.requestreply.lowlevel.request that will be
+     *                 sent to the kubeMQ.
+     * @param response StreamObserver for the response for the request that was
+     *                 sent.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public void SendRequestAsync(io.kubemq.sdk.commandquery.Request request, final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
+    public void SendRequestAsync(io.kubemq.sdk.commandquery.Request request, final StreamObserver<Response> response)
+            throws ServerAddressNotSuppliedException, SSLException {
         _initiator.SendRequest(CreateLowLevelRequest(request), response);
     }
 
     /**
      * Send a single async request using the KubeMQ with override parameters.
      *
-     * @param request        The io.kubemq.sdk.requestreply.lowlevel.request that will be sent to the kubeMQ.
-     * @param overrideParams Allow overwriting "Timeout" "CacheKey" and "CacheTTL" for a single Request.
-     * @param response       StreamObserver for the response for the request that was sent.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @param request        The io.kubemq.sdk.requestreply.lowlevel.request that
+     *                       will be sent to the kubeMQ.
+     * @param overrideParams Allow overwriting "Timeout" "CacheKey" and "CacheTTL"
+     *                       for a single Request.
+     * @param response       StreamObserver for the response for the request that
+     *                       was sent.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public void SendRequestAsync(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams, final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
+    public void SendRequestAsync(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams,
+            final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
         _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams), response);
     }
 
     /**
      * Send a single request using the KubeMQ.
      *
-     * @param request The io.kubemq.sdk.requestreply.lowlevel.request that will be sent to the kubeMQ.
+     * @param request The io.kubemq.sdk.requestreply.lowlevel.request that will be
+     *                sent to the kubeMQ.
      * @return response for the request that was sent.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public Response SendRequest(io.kubemq.sdk.commandquery.Request request) throws ServerAddressNotSuppliedException, SSLException {
+    public Response SendRequest(io.kubemq.sdk.commandquery.Request request)
+            throws ServerAddressNotSuppliedException, SSLException {
         return _initiator.SendRequest(CreateLowLevelRequest(request));
     }
 
     /**
      * Send a single request using the KubeMQ with override parameters.
      *
-     * @param request        The io.kubemq.sdk.requestreply.lowlevel.request that will be sent to the kubeMQ.
-     * @param overrideParams Allow overwriting "Timeout" "CacheKey" and "CacheTTL" for a single Request.
+     * @param request        The io.kubemq.sdk.requestreply.lowlevel.request that
+     *                       will be sent to the kubeMQ.
+     * @param overrideParams Allow overwriting "Timeout" "CacheKey" and "CacheTTL"
+     *                       for a single Request.
      * @return response for the request that was sent.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public Response SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams) throws ServerAddressNotSuppliedException, SSLException {
+    public Response SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams)
+            throws ServerAddressNotSuppliedException, SSLException {
         return _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams));
+    }
+
+    /**
+     * Ping check Kubemq response using Channel.
+     * 
+     * @return PingResult
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
+    public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+       return _initiator.Ping();
     }
 
     private void isValid() {
@@ -191,6 +237,7 @@ public class Channel {
         innerRequest.setRequestId(request.getRequestId());
         innerRequest.setBody(request.getBody());
         innerRequest.setMetadata(request.getMetadata());
+        innerRequest.setTags(request.getTags());
 
         return innerRequest;
     }

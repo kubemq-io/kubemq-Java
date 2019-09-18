@@ -28,6 +28,8 @@ import io.kubemq.sdk.commandquery.RequestType;
 import io.kubemq.sdk.grpc.Kubemq;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,6 +77,8 @@ public class Request {
      */
     private int cacheTTL;
 
+    private Map<String, String> tags;
+
     /**
      * Initializes a new instance of the io.kubemq.sdk.requestreply.lowlevel.Request.
      */
@@ -95,7 +99,7 @@ public class Request {
      * @param cacheKey     Represents if the request should be saved from Cache and under what "Key"(java.lang.String) to save it.
      * @param cacheTTL     Cache time to live : for how long does the request should be saved in Cache.
      */
-    public Request(String requestId, RequestType requestType, String clientId, String channel, String replyChannel, String metadata, byte[] body, int timeout, String cacheKey, int cacheTTL) {
+    public Request(String requestId, RequestType requestType, String clientId, String channel, String replyChannel, String metadata, byte[] body, int timeout, String cacheKey, int cacheTTL, Map<String,String> tags) {
         this.requestId = requestId;
         this.requestType = requestType;
         this.clientId = clientId;
@@ -106,6 +110,7 @@ public class Request {
         this.timeout = timeout;
         this.cacheKey = cacheKey;
         this.cacheTTL = cacheTTL;
+        this.tags = tags;
     }
 
     Request(Kubemq.Request innerRequest) {
@@ -121,6 +126,7 @@ public class Request {
         this.timeout = innerRequest.getTimeout();
         this.cacheKey = Optional.ofNullable(innerRequest.getCacheKey()).orElse("");
         this.cacheTTL = innerRequest.getCacheTTL();
+        this.tags = innerRequest.getTagsMap();
     }
 
     /**
@@ -140,6 +146,8 @@ public class Request {
                 .setTimeout(timeout)
                 .setCacheKey(Optional.ofNullable(cacheKey).orElse(""))
                 .setCacheTTL(cacheTTL)
+                .setRequestTypeData(io.kubemq.sdk.grpc.Kubemq.Request.RequestType.values()[requestType.getValue()])
+                .putAllTags(Optional.ofNullable(tags).orElse(new HashMap<String,String>()))
                 .build();
     }
 
@@ -231,6 +239,13 @@ public class Request {
     public void setCacheTTL(int cacheTTL) {
         this.cacheTTL = cacheTTL;
     }
+    public Map<String,String> getTags(){
+        return tags;
+    }
+
+	public void setTags(Map<String, String> tags) {
+       this.tags = tags;
+	}
 
 
 }

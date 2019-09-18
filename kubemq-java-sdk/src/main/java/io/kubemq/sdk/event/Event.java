@@ -23,24 +23,32 @@
  */
 package io.kubemq.sdk.event;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Event {
     private String eventId;
     private String metadata;
     private byte[] body;
+    private Map<String,String> tags;
 
+  
     public Event() {
     }
 
+ 
     public Event(String eventId, String metadata, byte[] body) {
         this.eventId = eventId;
         this.metadata = metadata;
         this.body = body;
     }
 
+   
     public String getEventId() {
         return eventId;
     }
 
+    
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
@@ -59,6 +67,16 @@ public class Event {
 
     public void setBody(byte[] body) {
         this.body = body;
+    }
+
+    public Map<String, String> getTags() {
+        return this.tags;
+    }
+    public void setTag(String key, String value){
+        if (tags==null){
+            tags =  new HashMap<String,String>();
+        }
+        this.tags.putIfAbsent(key, value);
     }
 
 }

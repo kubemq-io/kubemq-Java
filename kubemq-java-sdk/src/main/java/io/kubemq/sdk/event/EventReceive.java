@@ -23,6 +23,9 @@
  */
 package io.kubemq.sdk.event;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.kubemq.sdk.grpc.Kubemq;
 
 public class EventReceive {
@@ -33,6 +36,7 @@ public class EventReceive {
     private byte[] body;
     private long timestamp;
     private long sequence;
+	private Map<String, String> tags;
 
     public EventReceive() {
     }
@@ -44,6 +48,7 @@ public class EventReceive {
         body = inner.getBody().toByteArray();
         timestamp = inner.getTimestamp();
         sequence = inner.getSequence();
+        tags = inner.getTagsMap();
     }
 
     public String getEventId() {
@@ -92,6 +97,16 @@ public class EventReceive {
 
     public void setSequence(long sequence) {
         this.sequence = sequence;
+    }
+
+    public Map<String, String> getTags() {
+        return this.tags;
+    }
+    public void setTag(String key, String value){
+        if (tags==null){
+            tags =  new HashMap<String,String>();
+        }
+        this.tags.putIfAbsent(key, value);
     }
 
 }

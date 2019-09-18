@@ -27,6 +27,7 @@ import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.kubemqGrpc;
+import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.kubemq.sdk.subscription.SubscribeRequest;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
@@ -44,8 +45,8 @@ public class Responder extends GrpcClient {
     private static Logger logger = LoggerFactory.getLogger(Responder.class);
 
     /**
-     * Initialize a new Responder to subscribe to Response.
-     * KubeMQAddress will be parsed from Config or environment parameter.
+     * Initialize a new Responder to subscribe to Response. KubeMQAddress will be
+     * parsed from Config or environment parameter.
      */
     public Responder() {
         this(null);
@@ -63,14 +64,23 @@ public class Responder extends GrpcClient {
     /**
      * Register to kubeMQ Channel using SubscribeRequest.
      *
-     * @param subscribeRequest        list represent by SubscribeRequest that will determine the subscription configuration.
-     * @param requestResponseObserver RequestResponseObserver to perform when receiving io.kubemq.sdk.requestreplay.RequestReceive.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @param subscribeRequest        list represent by SubscribeRequest that will
+     *                                determine the subscription configuration.
+     * @param requestResponseObserver RequestResponseObserver to perform when
+     *                                receiving
+     *                                io.kubemq.sdk.requestreplay.RequestReceive.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public void SubscribeToRequests(SubscribeRequest subscribeRequest, final RequestResponseObserver requestResponseObserver) throws ServerAddressNotSuppliedException, SSLException {
+    public void SubscribeToRequests(SubscribeRequest subscribeRequest,
+            final RequestResponseObserver requestResponseObserver)
+            throws ServerAddressNotSuppliedException, SSLException {
 
         ValidateSubscribeRequest(subscribeRequest);
+
+        this.Ping();
 
         Kubemq.Subscribe innerSubscribeRequest = subscribeRequest.ToInnerSubscribeRequest();
 
@@ -99,7 +109,22 @@ public class Responder extends GrpcClient {
         }
     }
 
-    public void SubscribeToRequestsAsync(SubscribeRequest subscribeRequest, final RequestResponseAsyncObserver requestResponseAsyncObserver) throws ServerAddressNotSuppliedException, SSLException {
+    /**
+     * Ping check Kubemq response.
+     * 
+     * @return PingResult
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
+    public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+        return GetKubeMQClient().ping(null);
+    }
+
+    public void SubscribeToRequestsAsync(SubscribeRequest subscribeRequest,
+            final RequestResponseAsyncObserver requestResponseAsyncObserver)
+            throws ServerAddressNotSuppliedException, SSLException {
 
         ValidateSubscribeRequest(subscribeRequest);
 
@@ -167,20 +192,13 @@ public class Responder extends GrpcClient {
     }
 
     private void LogRequest(Kubemq.Request request) {
-        logger.trace(
-                "Responder InnerRequest. RequestID:'{}', Channel:'{}', ReplyChannel:'{}'",
-                request.getRequestID(),
-                request.getChannel(),
-                request.getReplyChannel()
-        );
+        logger.trace("Responder InnerRequest. RequestID:'{}', Channel:'{}', ReplyChannel:'{}'", request.getRequestID(),
+                request.getChannel(), request.getReplyChannel());
     }
 
     private void LogResponse(Kubemq.Response response) {
-        logger.trace(
-                "Responder InnerResponse. ID:'{}', ReplyChannel:'{}'",
-                response.getRequestID(),
-                response.getReplyChannel()
-        );
+        logger.trace("Responder InnerResponse. ID:'{}', ReplyChannel:'{}'", response.getRequestID(),
+                response.getReplyChannel());
     }
 
     public interface RequestResponseObserver {

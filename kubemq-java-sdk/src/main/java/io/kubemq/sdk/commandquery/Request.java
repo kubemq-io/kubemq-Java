@@ -23,8 +23,12 @@
  */
 package io.kubemq.sdk.commandquery;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Represents the Request used in requestreply io.kubemq.sdk.requestreply.channel
+ * Represents the Request used in requestreply
+ * io.kubemq.sdk.requestreply.channel
  */
 public class Request {
 
@@ -42,6 +46,8 @@ public class Request {
      * Represents The content of the Request
      */
     private byte[] body;
+
+    private Map<String,String> tags;
 
     /**
      * Initializes a new instance of the Request
@@ -87,6 +93,17 @@ public class Request {
 
     public void setBody(byte[] body) {
         this.body = body;
+    }
+    
+    public Map<String, String> getTags() {
+        return this.tags;
+    }
+
+    public void setTag(String key, String value){
+        if (tags==null){
+            tags =  new HashMap<String,String>();
+        }
+        this.tags.putIfAbsent(key, value);
     }
 
 }

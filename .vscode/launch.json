@@ -1,0 +1,84 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.SiteDocUseCases.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.Get_Started.RPC_Subscribe_to_a_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.Get_Started.RPC_Send_a_Command_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.commandquerychannel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(1)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.commandqueryinitiator.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(2)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.commandqueryresponder.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(3)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.commandqueryresponderasync.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(4)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.eventchannel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(5)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.eventsender.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(6)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.eventsubscriber.Program",
+            "projectName": "examples"
+        }
+    ]
+}

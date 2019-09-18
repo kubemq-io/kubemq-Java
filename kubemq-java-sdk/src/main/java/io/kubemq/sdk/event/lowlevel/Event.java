@@ -27,6 +27,8 @@ import com.google.protobuf.ByteString;
 import io.kubemq.sdk.grpc.Kubemq;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,6 +63,7 @@ public class Event {
      * Represents if the messages should be send to persistence
      */
     private boolean store;
+    private Map<String, String> tags;
 
     /**
      * Initializes a new instance of the Event
@@ -78,13 +81,14 @@ public class Event {
      * @param clientID Represents the sender ID that the messages will be send under
      * @param store    Represents if the messages should be send to persistence
      */
-    public Event(String channel, String metadata, byte[] body, String eventId, String clientID, boolean store) {
+    public Event(String channel, String metadata, byte[] body, String eventId, String clientID, boolean store, Map<String,String> tags) {
         this.channel = channel;
         this.metadata = metadata;
         this.body = body;
         this.eventId = eventId;
         this.clientID = clientID;
         this.store = store;
+        this.tags = tags;
     }
 
     Event(Kubemq.Event event) {
@@ -95,6 +99,7 @@ public class Event {
                 ? GetNextId().toString()
                 : event.getEventID();
         clientID = event.getClientID();
+        tags = event.getTagsMap();
         store = event.getStore();
     }
 
@@ -108,6 +113,7 @@ public class Event {
                         : eventId)
                 .setClientID(clientID)
                 .setStore(store)
+                .putAllTags(Optional.ofNullable(tags).orElse(new HashMap<String,String>()))
                 .build();
     }
 
@@ -148,6 +154,8 @@ public class Event {
         return eventId;
     }
 
+
+
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
@@ -175,5 +183,15 @@ public class Event {
     public void setReturnResult(boolean returnResult) {
         this.returnResult = returnResult;
     }
+    public Map<String, String> getTags() {
+        return this.tags;
+    }
+    public void setTag(String key, String value){
+        if (tags==null){
+            tags =  new HashMap<String,String>();
+        }
+        this.tags.putIfAbsent(key, value);
+    }
+
 
 }
