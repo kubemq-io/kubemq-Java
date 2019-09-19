@@ -1,4 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ <name>${project.groupId}:${project.artifactId}</name>
+ <description>KubeMQ SDK for Java enables Java developers to easily work with KubeMQ server</description>
+ <url>https://docs.kubemq.io/reference/java.html</url>
+ <licenses>
+      <license>
+          <name>MIT License</name>
+          <url>http://www.opensource.org/licenses/mit-license.php</url>
+          <distribution>repo</distribution>
+      </license>
+  </licenses>
+   <developers>
+      <developer>
+          <name>Ido.Sheffer</name>
+          <email>Ido.Sheffer@kubemq.io</email>
+          <!-- Your organization, or Github is fine too -->
+          <organization>kubemq.io</organization>       
+          <organizationUrl>kubemq.io</organizationUrl>
+      </developer>
+  </developers>
+
+   <scm>
+      <!-- Should be format scm:git:git or scm:git:https -->
+      <connection>scm:git:https://github.com/kubemq-io/kubemq-Java.git</connection>
+      <developerConnection>scm:git:ssh://github.com/kubemq-io/kubemq-Java.git</developerConnection>
+      <url>https://github.com/kubemq-io/kubemq-Java</url>
+      <tag>HEAD</tag>
+  </scm>
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>kubemq-sdk-java</groupId>
   <artifactId>kubemq-sdk-java</artifactId>
