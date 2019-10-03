@@ -4,8 +4,8 @@ plugins {
 
 
 
-group 'kubemq.io'
-version '1.0-SNAPSHOT'
+group 'io.kubemq.sdk'
+version '1.0.1'
 
 sourceCompatibility = 1.8
 

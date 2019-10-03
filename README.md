@@ -20,7 +20,7 @@ KubeMQ-SDK-Java works with JDK 8+
 ### Installing
 
 The recommended way to use the SDK for Java in your project is to consume it from Maven.
-https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/sdk/kubemq-sdk-Java/0.1.6/kubemq-sdk-Java-0.1.6.jar
+https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/sdk/kubemq-sdk-Java/1.0.1/kubemq-sdk-Java-1.0.1.jar
 To build with Gradle, add the dependency below to your build.gradle file.
 
 ``` java

@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
- <name>${project.groupId}:${project.artifactId}</name>
+ <name>io.kubemq.sdk:kubemq-sdk-Java</name>
  <description>KubeMQ SDK for Java enables Java developers to easily work with KubeMQ server</description>
  <url>https://docs.kubemq.io/reference/java.html</url>
  <licenses>
@@ -28,9 +28,9 @@
   </scm>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>kubemq-sdk-java</groupId>
-  <artifactId>kubemq-sdk-java</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>io.kubemq.sdk</groupId>
+  <artifactId>kubemq-sdk-Java</artifactId>
+  <version>1.0.1</version>
   <build>
     <plugins>
       <plugin>

@@ -132,7 +132,8 @@ public class Program {
     private static void Send_Message_to_a_Queue() throws ServerAddressNotSuppliedException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         SendMessageResult resSend = queue.SendQueueMessage(new Message()
-                .setBody(Converter.ToByteArray("some-simple_queue-queue-message")).setMetadata("someMeta"));
+                .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
+                .setMetadata("someMeta"));
         if (resSend.getIsError()) {
             System.out.printf("Message enqueue error, error: %s", resSend.getError());
         }
