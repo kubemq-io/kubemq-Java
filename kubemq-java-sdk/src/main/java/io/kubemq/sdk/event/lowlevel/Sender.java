@@ -125,9 +125,9 @@ public class Sender extends GrpcClient {
         return new StreamObserver<Event>() {
             @Override
             public void onNext(Event notification) {
-                if (notification.isReturnResult()) {
+               // if (notification.isReturnResult()) {
                     streamObserver.onNext(notification.ToInnerEvent());
-                }
+              //  }
             }
 
             @Override

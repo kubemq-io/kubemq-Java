@@ -6,24 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "CodeLens (Launch) - Program",
+            "name": "Debug (Launch)",
             "request": "launch",
-            "mainClass": "io.kubemq.sdk.examples.SiteDocUseCases.Program",
-            "projectName": "examples"
-        },
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - Program",
-            "request": "launch",
-            "mainClass": "io.kubemq.sdk.examples.Get_Started.RPC_Subscribe_to_a_Channel.Program",
-            "projectName": "examples"
-        },
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - Program",
-            "request": "launch",
-            "mainClass": "io.kubemq.sdk.examples.Get_Started.RPC_Send_a_Command_Channel.Program",
-            "projectName": "examples"
+            "mainClass": ""
         },
         {
             "type": "java",
@@ -78,6 +63,55 @@
             "name": "Debug (Launch)-Program<examples>(6)",
             "request": "launch",
             "mainClass": "io.kubemq.sdk.examples.eventsubscriber.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(7)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.get_Started.pubSub_Publish_to_a_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(8)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.get_Started.pubSub_Subscribe_to_a_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(9)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.get_Started.queue_Receive_a_Message.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(10)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.get_Started.queue_Send_a_Message.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(11)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.get_Started.rPC_Send_a_Command_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(12)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.get_Started.rPC_Subscribe_to_a_Channel.Program",
+            "projectName": "examples"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Program<examples>(13)",
+            "request": "launch",
+            "mainClass": "io.kubemq.sdk.examples.siteDocUseCases.Program",
             "projectName": "examples"
         }
     ]
