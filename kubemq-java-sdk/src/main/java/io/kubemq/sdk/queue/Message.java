@@ -217,7 +217,8 @@ public class Message {
     if (this.policy==null){
       this.policy = QueueMessagePolicy.getDefaultInstance();
     }
-    this.policy.newBuilderForType().setMaxReceiveCount(maxReciveCount).build();
+    this.policy = this.policy.toBuilder().setMaxReceiveCount(maxReciveCount).build();
+    
     return this;
   }
 
@@ -231,7 +232,7 @@ public class Message {
     if (this.policy==null){
       this.policy = QueueMessagePolicy.getDefaultInstance();
     }
-    this.policy.newBuilderForType().setMaxReceiveQueue(maxReciveQueue).build();
+    this.policy = this.policy.toBuilder().setMaxReceiveQueue(maxReciveQueue).build();
     return this;
   }
 
@@ -245,7 +246,8 @@ public class Message {
     if (this.policy==null){
       this.policy = QueueMessagePolicy.getDefaultInstance();
     }
-    this.policy.newBuilderForType().setExpirationSeconds(expiration).build();
+  
+    this.policy = this.policy.toBuilder().setExpirationSeconds(expiration).build();
     return this;
   }
 
@@ -259,7 +261,7 @@ public class Message {
     if (this.policy==null){
       this.policy = QueueMessagePolicy.getDefaultInstance();
     }
-    this.policy.newBuilderForType().setDelaySeconds(delay).build();
+    this.policy =  this.policy.toBuilder().setDelaySeconds(delay).build();
     return this;
   }
 
