@@ -32,6 +32,7 @@ import io.grpc.stub.StreamObserver;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
+import io.kubemq.sdk.grpc.Kubemq.QueueMessage;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesRequest;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse;
 import io.kubemq.sdk.tools.IDGenerator;
@@ -45,13 +46,26 @@ public class Transaction extends GrpcClient {
 
     private Queue queue;
     protected StreamQueueMessagesResponse msg;
+    protected StreamQueueMessagesResponse latestMsg;
     private StreamObserver<StreamQueueMessagesResponse> respStreamObserver;
     private StreamObserver<StreamQueueMessagesRequest> reqStreamObserver;
 
     private final Object lock = new Object();
     private Boolean streamResponded = false;
 
-    private boolean visbilityExp;
+    private boolean visibilityExp;
+
+    public boolean getExpirationStatus() {
+        return this.visibilityExp;
+    }
+
+    public QueueMessage getCurrentHandledMessage() {
+        if (msg == null) {
+            return null;
+        } else {
+            return this.msg.getMessage();
+        }
+    }
 
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
         this.queue = queue;
@@ -66,14 +80,15 @@ public class Transaction extends GrpcClient {
      * @return Transaction response
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException Error in response from stream
+     * @throws IOException                       Error in response from stream
      */
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
             throws ServerAddressNotSuppliedException, IOException {
         if (msg != null) {
-            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
         }
-        visbilityExp =false;
+        visibilityExp = false;
         Kubemq.StreamQueueMessagesResponse resp;
         OpenStream();
 
@@ -92,11 +107,12 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException Error in response from stream
+     * @throws IOException                       Error in response from stream
      */
     public TransactionMessagesResponse AckMessage() throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -114,18 +130,25 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException Error in response from stream
+     * @throws IOException                       Error in response from stream
      */
     public TransactionMessagesResponse RejectMessage() throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
-        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
-                .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
-                .setStreamRequestTypeData(Kubemq.StreamRequestType.RejectMessage)
-                .setRefSequence(msg.getMessage().getAttributes().getSequence()).build());
+        try {
+            resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder()
+                    .setClientID(this.queue.getClientID()).setChannel(this.queue.getQueueName())
+                    .setRequestID(IDGenerator.Getid()).setStreamRequestTypeData(Kubemq.StreamRequestType.RejectMessage)
+                    .setRefSequence(msg.getMessage().getAttributes().getSequence()).build());
+
+        } catch (NullPointerException ex) {
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
+        }
 
         return new TransactionMessagesResponse(resp);
     }
@@ -137,12 +160,13 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException Error in response from stream
+     * @throws IOException                       Error in response from stream
      */
     public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
             throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("No Active queue message, visability expired"+visbilityExp, null, null);
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -162,17 +186,18 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException Error in response from stream
+     * @throws IOException                       Error in response from stream
      */
     public TransactionMessagesResponse ReSend(String queueName) throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
         resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
                 .setChannel(queueName).setRequestID(IDGenerator.Getid())
-                
+
                 .setStreamRequestTypeData(Kubemq.StreamRequestType.ResendMessage).build());
 
         return new TransactionMessagesResponse(resp);
@@ -185,11 +210,12 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException Error in response from stream
+     * @throws IOException                       Error in response from stream
      */
     public TransactionMessagesResponse Modify(Message message) throws ServerAddressNotSuppliedException, IOException {
         if (msg == null) {
-            return new TransactionMessagesResponse("No Active queue message, visability expired:"+visbilityExp, null, null);
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
         }
         Kubemq.StreamQueueMessagesResponse resp;
 
@@ -211,15 +237,17 @@ public class Transaction extends GrpcClient {
                 public void onNext(StreamQueueMessagesResponse value) {
                     synchronized (lock) {
                         if (value.getIsError()) {
-                            if(value.getError().contains("Error 129")){
+                            if (value.getError().contains("Error 129")) {
                                 msg = null;
-                                visbilityExp =true;
-                             }
-                         
-                        } else {
+                                visibilityExp = true;
+                            }
+                            ;
+                        } else if (value
+                                .getStreamRequestTypeData() == io.kubemq.sdk.grpc.Kubemq.StreamRequestType.ReceiveMessage) {
                             msg = value;
                         }
-
+                        ;
+                        latestMsg = value;
                         streamResponded = true;
                         lock.notify();
                     }
@@ -228,6 +256,7 @@ public class Transaction extends GrpcClient {
                 @Override
                 public void onError(Throwable t) {
                     msg = null;
+                    latestMsg = null;
                     streamResponded = true;
                     lock.notify();
                 }
@@ -235,6 +264,7 @@ public class Transaction extends GrpcClient {
                 @Override
                 public void onCompleted() {
                     msg = null;
+                    latestMsg = null;
                     streamResponded = true;
                     reqStreamObserver = null;
 
@@ -264,7 +294,7 @@ public class Transaction extends GrpcClient {
                 }
             }
         }
-        return msg;
+        return latestMsg;
     }
 
 }
