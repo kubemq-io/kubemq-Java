@@ -452,6 +452,7 @@ public class Program {
         subscribeRequest.setClientID(ClientID);
         subscribeRequest.setSubscribeType(SubscribeType.EventsStore);
         subscribeRequest.setEventsStoreType(EventsStoreType.StartAtSequence);
+        subscribeRequest.setEventsStoreTypeValue(1);
 
         StreamObserver<EventReceive> streamObserver = new StreamObserver<EventReceive>() {
 
