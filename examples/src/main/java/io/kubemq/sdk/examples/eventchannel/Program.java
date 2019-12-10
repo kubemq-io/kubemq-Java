@@ -32,7 +32,7 @@ public class Program {
 
     public static void main(String[] args) {
         System.out.println();
-        System.out.println("Starting PubsubChannel...");
+        System.out.println("Starting PubSubChannel...");
         System.out.println();
         System.out.println("Press 'Enter' to stop the application...");
         System.out.println();

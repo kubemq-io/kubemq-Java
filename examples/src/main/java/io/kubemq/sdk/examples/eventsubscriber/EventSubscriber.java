@@ -41,19 +41,19 @@ class EventSubscriber extends BaseExample {
     EventSubscriber() throws ServerAddressNotSuppliedException, SSLException {
         super("EventSubscriber");
         Subscriber subscriber = new Subscriber();
-        SubcribeToEventsWithoutStore();
-        SubcribeToEventsWithStore();
+        SubscribeToEventsWithoutStore();
+        SubscribeToEventsWithStore();
 
     }
 
-    private void SubcribeToEventsWithStore() throws ServerAddressNotSuppliedException, SSLException {
+    private void SubscribeToEventsWithStore() throws ServerAddressNotSuppliedException, SSLException {
         subscriber = new Subscriber();
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.EventsStore, EventsStoreType.StartAtSequence, 2);
         EventReceive eventReceive = subscriber.SubscribeToEvents(subscribeRequest);
         HandleIncomingEvents(eventReceive);
     }
 
-    private void SubcribeToEventsWithoutStore() throws ServerAddressNotSuppliedException, SSLException {
+    private void SubscribeToEventsWithoutStore() throws ServerAddressNotSuppliedException, SSLException {
         subscriber = new Subscriber();
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.Events);
         EventReceive eventReceive = subscriber.SubscribeToEvents(subscribeRequest);

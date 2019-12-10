@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
 
-import com.google.protobuf.Empty;
-
 
 
 /**

@@ -62,7 +62,7 @@ public class Program {
         Send_Message_to_a_Queue();
         Send_Message_to_a_Queue_with_Expiration();
         Send_Message_to_a_Queue_with_Delay();
-        Send_Message_to_a_Queue_with_Deadletter_Queue();
+        Send_Message_to_a_Queue_with_DeadLetter_Queue();
         Send_Batch_Messages();
         Receive_Messages_from_a_Queue();
         Peek_Messages_from_a_Queue();
@@ -159,7 +159,7 @@ public class Program {
         }
     }
 
-    private static void Send_Message_to_a_Queue_with_Deadletter_Queue()
+    private static void Send_Message_to_a_Queue_with_DeadLetter_Queue()
             throws ServerAddressNotSuppliedException, IOException {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         SendMessageResult resSend = queue
@@ -319,7 +319,7 @@ public class Program {
         System.out.printf("MessageID: %d, Body:%s", resRec.getMessage().getMessageID(),
                 Converter.FromByteArray(resRec.getMessage().getBody()));
         TransactionMessagesResponse resMod = tran
-                .Modify(resRec.getMessage().setQueue("receiverB").setMetadata("new meatdata"));
+                .Modify(resRec.getMessage().setQueue("receiverB").setMetadata("new metadata"));
         if (resMod.getIsError()) {
             System.out.printf("Message Modify error, error::%s", resMod.getError());
             return;

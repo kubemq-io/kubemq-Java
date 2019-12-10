@@ -31,7 +31,6 @@ import javax.net.ssl.SSLException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Responder;
 import io.kubemq.sdk.commandquery.Response;
-import io.kubemq.sdk.grpc.Kubemq.PingResult;
 import io.kubemq.sdk.subscription.SubscribeRequest;
 import io.kubemq.sdk.subscription.SubscribeType;
 

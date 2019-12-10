@@ -24,6 +24,11 @@
 package io.kubemq.sdk.basic;
 
 public class ServerAddressNotSuppliedException extends Exception {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     ServerAddressNotSuppliedException() {
         super("Server Address was not supplied");
     }
