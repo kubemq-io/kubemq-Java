@@ -52,7 +52,7 @@ public class Program {
             @Override
             public void onNext(EventReceive value) {
                 try {
-                    System.out.printf("Event Received: EventID: %d, Channel: %s, Metadata: %s, Body: %s",
+                    System.out.printf("Event Received: EventID: %s, Channel: %s, Metadata: %s, Body: %s",
                             value.getEventId(), value.getChannel(), value.getMetadata(),
                             Converter.FromByteArray(value.getBody()));
                 } catch (ClassNotFoundException e) {

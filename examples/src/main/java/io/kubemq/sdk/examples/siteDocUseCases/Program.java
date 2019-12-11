@@ -75,9 +75,9 @@ public class Program {
 
         Receiving_Events();
         Sending_Events_Single_Event();
-        Sending_Events_Stream_Events();
+         Sending_Events_Stream_Events();
 
-        Receiving_Events_Store();
+        Receiving_Events_Store();    
         Sending_Events_Store_Single_Event_to_Store();
         Sending_Events_Store_Stream_Events_Store();
 
@@ -244,7 +244,7 @@ public class Program {
             System.out.printf("Message dequeue error, error: %s", resRec.getError());
             return;
         }
-        System.out.printf("MessageID: %d, Body: %s", resRec.getMessage().getMessageID(),
+        System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
                 Converter.FromByteArray(resRec.getMessage().getBody()));
         System.out.println("Doing some work.....");
 
@@ -266,7 +266,7 @@ public class Program {
             System.out.printf("Message dequeue error, error: %s", resRec.getError());
             return;
         }
-        System.out.printf("MessageID: %d, Body: %s", resRec.getMessage().getMessageID(),
+        System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
                 Converter.FromByteArray(resRec.getMessage().getBody()));
         System.out.println("Reject message");
         TransactionMessagesResponse resRej = tran.RejectMessage();
@@ -286,7 +286,7 @@ public class Program {
             System.out.printf("Message dequeue error, error: %s", resRec.getError());
             return;
         }
-        System.out.printf("MessageID: %d, Body: %s", resRec.getMessage().getMessageID(),
+        System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
                 Converter.FromByteArray(resRec.getMessage().getBody()));
         System.out.println("work for 1 seconds");
         Thread.sleep(1000);
@@ -316,7 +316,7 @@ public class Program {
             System.out.printf("Message dequeue error, error: %s", resRec.getError());
             return;
         }
-        System.out.printf("MessageID: %d, Body:%s", resRec.getMessage().getMessageID(),
+        System.out.printf("MessageID: %s, Body:%s", resRec.getMessage().getMessageID(),
                 Converter.FromByteArray(resRec.getMessage().getBody()));
         TransactionMessagesResponse resMod = tran
                 .Modify(resRec.getMessage().setQueue("receiverB").setMetadata("new metadata"));
@@ -335,7 +335,7 @@ public class Program {
             System.out.printf("Message dequeue error, error: %s", resRec.getError());
             return;
         }
-        System.out.printf("MessageID: %d, Body:%s", resRec.getMessage().getMessageID(),
+        System.out.printf("MessageID: %s, Body:%s", resRec.getMessage().getMessageID(),
                 Converter.FromByteArray(resRec.getMessage().getBody()));
 
         System.out.println("Resend to new queue");
@@ -362,7 +362,7 @@ public class Program {
             @Override
             public void onNext(EventReceive value) {
                 try {
-                    System.out.printf("Event Received: EventID: %d, Channel: %s, Metadata: %s, Body: %s",
+                    System.out.printf("Event Received: EventID: %s, Channel: %s, Metadata: %s, Body: %s",
                             value.getEventId(), value.getChannel(), value.getMetadata(),
                             Converter.FromByteArray(value.getBody()));
                 } catch (ClassNotFoundException e) {
@@ -444,7 +444,7 @@ public class Program {
     }
 
     private static void Receiving_Events_Store() throws SSLException, ServerAddressNotSuppliedException {
-        String ChannelName = "testing_event_channel", ClientID = "hello-world-subscriber",
+        String ChannelName = "testing_store_channel", ClientID = "hello-world-subscriber",
                 KubeMQServerAddress = "localhost:50000";
         Subscriber subscriber = new Subscriber(KubeMQServerAddress);
         SubscribeRequest subscribeRequest = new SubscribeRequest();
@@ -523,7 +523,7 @@ public class Program {
     }
 
     private static void Sending_Events_Store_Single_Event_to_Store() throws IOException {
-        String ChannelName = "testing_event_channel", ClientID = "hello-world-sender",
+        String ChannelName = "testing_store_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
 
         io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, false,
@@ -600,7 +600,7 @@ public class Program {
             System.out.printf("Response error: %s", result.getError());
             return;
         }
-        System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
+        System.out.printf("Response Received: %s, ExecutedAt: %s", result.getRequestID(), result.getTimestamp());
     }
 
     private static void Commands_Sending_Command_Request_async() throws ServerAddressNotSuppliedException, IOException {
@@ -695,7 +695,7 @@ public class Program {
             System.out.printf("Response error: %s", result.getError());
             return;
         }
-        System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
+        System.out.printf("Response Received: %s, ExecutedAt: %s", result.getRequestID(), result.getTimestamp());
     }
 
     private static void Queries_Sending_Query_Request_async() throws IOException, ServerAddressNotSuppliedException {
@@ -717,7 +717,7 @@ public class Program {
                 if (!value.isExecuted()) {
 
                     System.out.printf("Response error: %s", value.getError());
-                    System.out.printf("Response Received: %s, ExecutedAt %d", value.getRequestID(),
+                    System.out.printf("Response Received: %s, ExecutedAt s", value.getRequestID(),
                             value.getTimestamp());
                 }
 
