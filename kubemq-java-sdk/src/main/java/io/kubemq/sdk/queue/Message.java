@@ -270,8 +270,8 @@ public class Message {
         .setMessageID(this.messageID == null ? IDGenerator.Getid() : this.getMessageID()).setClientID(this.clientID)
         .setChannel(this.queueName).setBody(ByteString.copyFrom(this.body))
         .setMetadata(this.metadata==null ? "" : this.metadata )
-        .setPolicy(this.policy==null? null:this.policy)
-        .setAttributes(this.attributes==null? Kubemq.QueueMessageAttributes.getDefaultInstance() :this.attributes)
+        .setPolicy(this.policy==null ? Kubemq.QueueMessagePolicy.getDefaultInstance() : this.policy)
+        .setAttributes(this.attributes==null ? Kubemq.QueueMessageAttributes.getDefaultInstance() : this.attributes)
         .build();        
   
     return tempmsg;
