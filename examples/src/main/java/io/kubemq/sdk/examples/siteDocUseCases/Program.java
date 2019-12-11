@@ -78,15 +78,15 @@ public class Program {
          Sending_Events_Stream_Events();
 
         Receiving_Events_Store();    
-        Sending_Events_Store_Single_Event_to_Store();
+        Sending_Events_Store_Single_Event_to_Store();     
         Sending_Events_Store_Stream_Events_Store();
-
+        
         Commands_Receiving_Commands_Requests();
         Commands_Sending_Command_Request();
         Commands_Sending_Command_Request_async();
 
-        Queries_Receiving_Query_Requests();
-        Queries_Sending_Query_Request();
+        Queries_Receiving_Query_Requests();   
+        Queries_Sending_Query_Request();       
         Queries_Sending_Query_Request_async();
 
         try {
@@ -444,7 +444,7 @@ public class Program {
     }
 
     private static void Receiving_Events_Store() throws SSLException, ServerAddressNotSuppliedException {
-        String ChannelName = "testing_store_channel", ClientID = "hello-world-subscriber",
+        String ChannelName = "testing_store_channel", ClientID = "hello-world-subscribe1r",
                 KubeMQServerAddress = "localhost:50000";
         Subscriber subscriber = new Subscriber(KubeMQServerAddress);
         SubscribeRequest subscribeRequest = new SubscribeRequest();
@@ -488,7 +488,7 @@ public class Program {
 
     private static void Sending_Events_Store_Stream_Events_Store()
             throws ServerAddressNotSuppliedException, IOException {
-        String ChannelName = "testing_event_channel", ClientID = "hello-world-sender",
+        String ChannelName = "testing_store_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
 
         io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, true,
@@ -621,6 +621,9 @@ public class Program {
             public void onNext(Response value) {
                 if (!value.isExecuted()) {
                     System.out.printf("Response error: %s", value.getError());
+                }else {                
+                    System.out.printf("Response Received: %s, ExecutedAt %s", value.getRequestID(),
+                            value.getTimestamp());
                 }
             }
 
@@ -639,7 +642,7 @@ public class Program {
     }
 
     private static void Queries_Receiving_Query_Requests() throws SSLException, ServerAddressNotSuppliedException {
-        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
+        String ChannelName = "testing_Queries_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
         Responder.RequestResponseObserver HandleIncomingRequests;
         Responder responder = new Responder(KubeMQServerAddress);
@@ -678,7 +681,7 @@ public class Program {
     }
 
     private static void Queries_Sending_Query_Request() throws IOException, ServerAddressNotSuppliedException {
-        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
+        String ChannelName = "testing_Queries_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
         io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
         channelParameters.setChannelName(ChannelName);
@@ -699,14 +702,14 @@ public class Program {
     }
 
     private static void Queries_Sending_Query_Request_async() throws IOException, ServerAddressNotSuppliedException {
-        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
+        String ChannelName = "testing_Queries_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
         io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
         channelParameters.setChannelName(ChannelName);
         channelParameters.setClientID(ClientID);
         channelParameters.setKubeMQAddress(KubeMQServerAddress);
         channelParameters.setRequestType(RequestType.Query);
-        channelParameters.setTimeout(1000);
+        channelParameters.setTimeout(100000);
         io.kubemq.sdk.commandquery.Channel channel = new io.kubemq.sdk.commandquery.Channel(channelParameters);
         Request request = new Request();
         request.setBody(Converter.ToByteArray("hello kubemq - sending a query, please reply"));
@@ -715,9 +718,9 @@ public class Program {
             @Override
             public void onNext(Response value) {
                 if (!value.isExecuted()) {
-
-                    System.out.printf("Response error: %s", value.getError());
-                    System.out.printf("Response Received: %s, ExecutedAt s", value.getRequestID(),
+                    System.out.printf("Response error: %s", value.getError());                 
+                }else {                
+                    System.out.printf("Response Received: %s, ExecutedAt %s", value.getRequestID(),
                             value.getTimestamp());
                 }
 
