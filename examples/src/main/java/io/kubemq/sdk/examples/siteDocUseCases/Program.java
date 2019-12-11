@@ -491,7 +491,7 @@ public class Program {
         String ChannelName = "testing_event_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
 
-        io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, false,
+        io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, true,
                 KubeMQServerAddress);
 
         StreamObserver<Result> streamResObserver = new StreamObserver<Result>() {
@@ -526,7 +526,7 @@ public class Program {
         String ChannelName = "testing_store_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
 
-        io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, false,
+        io.kubemq.sdk.event.Channel channel = new io.kubemq.sdk.event.Channel(ChannelName, ClientID, true,
                 KubeMQServerAddress);
         for (int i = 0; i < 10; i++) {
             Event event = new Event();
