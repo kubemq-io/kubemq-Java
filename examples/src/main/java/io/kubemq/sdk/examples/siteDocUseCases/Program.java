@@ -63,7 +63,7 @@ public class Program {
         Send_Message_to_a_Queue_with_Expiration();
         Send_Message_to_a_Queue_with_Delay();
         Send_Message_to_a_Queue_with_DeadLetter_Queue();
-        Send_Batch_Messages();
+        Send_Batch_Messages();     
         Receive_Messages_from_a_Queue();
         Peek_Messages_from_a_Queue();
         Transactional_Queue_Ack_BAD();
