@@ -24,9 +24,12 @@
 package io.kubemq.sdk.queue;
 
 import java.io.IOException;
+import java.text.BreakIterator;
 import java.util.concurrent.Semaphore;
 
 import javax.net.ssl.SSLException;
+
+import com.fasterxml.jackson.core.util.BufferRecycler;
 
 import io.grpc.stub.StreamObserver;
 import io.kubemq.sdk.basic.GrpcClient;
@@ -49,14 +52,16 @@ public class Transaction extends GrpcClient {
     protected StreamQueueMessagesResponse latestMsg;
     private StreamObserver<StreamQueueMessagesResponse> respStreamObserver;
     private StreamObserver<StreamQueueMessagesRequest> reqStreamObserver;
+    ErrorObserver testerror;
 
     private final Object lock = new Object();
-    private Boolean streamResponded = false;
+    boolean visibilityExp;
 
-    private boolean visibilityExp;
+    TranState state = TranState.Ready;
 
-    public boolean getExpirationStatus() {
-        return this.visibilityExp;
+    private enum TranState {
+        Ready, StreamRegistered, StreamOpened, StreamClosing, StreamClosed, InTransaction
+
     }
 
     public QueueMessage getCurrentHandledMessage() {
@@ -65,6 +70,10 @@ public class Transaction extends GrpcClient {
         } else {
             return this.msg.getMessage();
         }
+    }
+
+    public interface ErrorObserver {
+        void onNext(Error error);
     }
 
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
@@ -82,15 +91,35 @@ public class Transaction extends GrpcClient {
      *                                           determined.
      * @throws IOException                       Error in response from stream
      */
-    public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
-            throws ServerAddressNotSuppliedException, IOException {
-        if (msg != null) {
+
+    public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds,
+            ErrorObserver errorobs) throws ServerAddressNotSuppliedException, IOException {
+        testerror = errorobs;
+        if (state != TranState.Ready) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
         }
-        visibilityExp = false;
         Kubemq.StreamQueueMessagesResponse resp;
-        OpenStream();
+        CreateNewObserver();
+
+        resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
+                .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
+                .setStreamRequestTypeData(Kubemq.StreamRequestType.ReceiveMessage)
+                .setVisibilitySeconds(visibilitySeconds).setWaitTimeSeconds(waitTimeSeconds).build());
+
+        return new TransactionMessagesResponse(resp);
+
+    }
+
+    public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
+            throws ServerAddressNotSuppliedException, IOException {
+
+        if (state != TranState.Ready) {
+            return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
+                    null);
+        }
+        Kubemq.StreamQueueMessagesResponse resp;
+        CreateNewObserver();
 
         resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
                 .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
@@ -172,6 +201,7 @@ public class Transaction extends GrpcClient {
 
         resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
                 .setChannel(this.queue.getQueueName()).setRequestID(IDGenerator.Getid())
+                .setVisibilitySeconds(visibilitySeconds)
                 .setStreamRequestTypeData(Kubemq.StreamRequestType.ModifyVisibility).build());
 
         return new TransactionMessagesResponse(resp);
@@ -217,6 +247,7 @@ public class Transaction extends GrpcClient {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
         }
+
         Kubemq.StreamQueueMessagesResponse resp;
 
         resp = StreamQueueMessage(Kubemq.StreamQueueMessagesRequest.newBuilder().setClientID(this.queue.getClientID())
@@ -227,72 +258,112 @@ public class Transaction extends GrpcClient {
         return new TransactionMessagesResponse(resp);
     }
 
-    private boolean OpenStream() {
+    private boolean CreateNewObserver() {
+        state = TranState.StreamOpened;
+        visibilityExp = false;
+        respStreamObserver = new StreamObserver<Kubemq.StreamQueueMessagesResponse>() {
 
-        if (respStreamObserver == null) {
-
-            respStreamObserver = new StreamObserver<Kubemq.StreamQueueMessagesResponse>() {
-
-                @Override
-                public void onNext(StreamQueueMessagesResponse value) {
-                    synchronized (lock) {
-                        if (value.getIsError()) {
-                            if (value.getError().contains("Error 129")) {
-                                msg = null;
-                                visibilityExp = true;
+            @Override
+            public void onNext(StreamQueueMessagesResponse value) {
+                synchronized (lock) {
+                    if (value.getIsError())
+                    // Error case
+                    {
+                        // VisabilityExpired
+                        if (value.getError().contains("Error 129")) {
+                            state = TranState.StreamClosing;
+                            latestMsg = value;
+                            visibilityExp = true;
+                            onCompleted();
+                            testerror.onNext(new Error(value.getError()));
+                            // send error
+                            return;
+                        } else {
+                            // Error in initial receive
+                            if (value
+                                    .getStreamRequestTypeData() == io.kubemq.sdk.grpc.Kubemq.StreamRequestType.ReceiveMessage) {
+                                state = TranState.StreamClosing;
+                                latestMsg = value;
+                                onCompleted();
+                                return;
                             }
-                            ;
-                        } else if (value
+                        }
+                    }
+                    // Other errors will not close the stream
+                    else
+                    // check if the initial msg received
+                    {
+                        if (value
                                 .getStreamRequestTypeData() == io.kubemq.sdk.grpc.Kubemq.StreamRequestType.ReceiveMessage) {
                             msg = value;
+                            state = TranState.InTransaction;
                         }
                         ;
-                        latestMsg = value;
-                        streamResponded = true;
+                    }
+                    latestMsg = value;
+                    lock.notify();
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                state = TranState.StreamClosing;
+                onCompleted();
+                }
+
+                @Override
+                public void onCompleted() { 
+                  if(state !=TranState.StreamClosed)  {
+                    synchronized (lock) {
+                        state =TranState.StreamClosed;                   
+                        if(msg!=null){
+                           msg = null;
+                        } 
                         lock.notify();
                     }
                 }
-
-                @Override
-                public void onError(Throwable t) {
-                    msg = null;
-                    latestMsg = null;
-                    streamResponded = true;
-                    lock.notify();
+                  
                 }
-
-                @Override
-                public void onCompleted() {
-                    msg = null;
-                    latestMsg = null;
-                    streamResponded = true;
-                    reqStreamObserver = null;
-
-                }
-            };
-        }
+            };        
         return true;
     }
 
     private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr)
-            throws SSLException, ServerAddressNotSuppliedException {
+            throws SSLException, ServerAddressNotSuppliedException
+       {
 
-        if (reqStreamObserver == null) {
-            reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);
+    
+        if (reqStreamObserver == null) {       
+            state = TranState.StreamRegistered;   
+            reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);          
+           
+        }else
+        {
+            
         }
-        streamResponded = false;
-        reqStreamObserver.onNext(sr);
-
+         
+        reqStreamObserver.onNext(sr);  
+        
         synchronized (lock) {
-            while (!streamResponded) {
+            while (true) {
                 try {
-                    lock.wait();
+                    lock.wait();                              
+                    if (state != TranState.InTransaction){ 
+                        return latestMsg;
+
+                    }
+                    else{
+                        break;
+                    }                   
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     return null;
                 }
-            }
+                finally{
+                    
+                }
+            }         
         }
         return latestMsg;
     }

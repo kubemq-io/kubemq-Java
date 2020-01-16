@@ -301,11 +301,9 @@ public class Queue extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      */
-    public Transaction CreateTransaction() throws ServerAddressNotSuppliedException {
-        if (transaction == null) {
-            transaction = new Transaction(this);
-        }
-        return transaction;
+    public Transaction CreateTransaction() throws ServerAddressNotSuppliedException {  
+     
+        return new Transaction(this);
     }
 
     private  Iterable<? extends Kubemq.QueueMessage> toQueueMessages(Iterable<Message> queueMessages) {
