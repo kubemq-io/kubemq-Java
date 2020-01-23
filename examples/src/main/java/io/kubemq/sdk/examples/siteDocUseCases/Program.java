@@ -63,7 +63,7 @@ public class Program {
         Send_Message_to_a_Queue_with_Expiration();
         Send_Message_to_a_Queue_with_Delay();
         Send_Message_to_a_Queue_with_DeadLetter_Queue();
-        Send_Batch_Messages();     
+        Send_Batch_Messages();
         Receive_Messages_from_a_Queue();
         Peek_Messages_from_a_Queue();
         Transactional_Queue_Ack_BAD();
@@ -75,19 +75,20 @@ public class Program {
 
         Receiving_Events();
         Sending_Events_Single_Event();
-         Sending_Events_Stream_Events();
+        Sending_Events_Stream_Events();
 
-        Receiving_Events_Store();    
-        Sending_Events_Store_Single_Event_to_Store();     
+        Receiving_Events_Store();
+        Sending_Events_Store_Single_Event_to_Store();
         Sending_Events_Store_Stream_Events_Store();
-        
+
         Commands_Receiving_Commands_Requests();
         Commands_Sending_Command_Request();
         Commands_Sending_Command_Request_async();
 
-        Queries_Receiving_Query_Requests();   
-        Queries_Sending_Query_Request();       
+        Queries_Receiving_Query_Requests();
+        Queries_Sending_Query_Request();
         Queries_Sending_Query_Request_async();
+       Transactional_Queue_Reject_Loop();
 
         try {
             int read = System.in.read();
@@ -96,6 +97,107 @@ public class Program {
         }
 
     }
+
+
+//     private static void Transactional_Queue_Reject_New()
+//     throws ServerAddressNotSuppliedException, ClassNotFoundException, InterruptedException, IOException {
+// int cnt =0;
+// Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+// while (true) {
+//     Transaction tran = queue.CreateTransaction();
+
+//     TransactionMessagesResponse resRec;
+//     var respStreamObserver = new StreamObserver<Kubemq.StreamQueueMessagesResponse>(){
+            
+//         @Override
+//         public void onNext(StreamQueueMessagesResponse value) {
+//             System.out.printf("transaction completed message message received");
+            
+//         }
+    
+//         @Override
+//         public void onError(Throwable t) {
+//             // TODO Auto-generated method stub
+//             System.out.printf("Error message");
+            
+//         }
+    
+//         @Override
+//         public void onCompleted() {
+//             // TODO Auto-generated method stub
+//             System.out.printf("transaction completed message");
+            
+//         }
+//     };
+
+
+//     try {
+//          tran.ReceiveNew(1,3,respStreamObserver);
+//     } catch (IOException e) {
+//         // TODO Auto-generated catch block
+//         e.printStackTrace();
+//         return;
+//     }
+//     if (resRec.getIsError()) {
+//         cnt++;
+//         System.out.printf("Message dequeue error, error: %s, %d!!!!!!!!!!!!!!\n", resRec.getError(),cnt);
+//          //   Thread.sleep(100);               
+//             continue;
+//     }}
+
+// }
+
+    private static void Transactional_Queue_Reject_Loop()
+            throws ServerAddressNotSuppliedException, ClassNotFoundException, InterruptedException, IOException {
+    int cnt =0;
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        while (true) {
+            Transaction tran = queue.CreateTransaction();
+            Transaction.ErrorObserver x = new Transaction.ErrorObserver(){
+            
+                @Override
+                public void onNext(Error error) {
+                    // TODO Auto-generated method stub
+                    System.out.printf("\n!!!!!!!!!!!!!Message dequeue %s, %d!!!!!!!!!!!!!!\n", error.getMessage());
+                    return;
+                }
+            };
+            TransactionMessagesResponse resRec;
+            try {
+                resRec = tran.Receive(1, 1,x );
+                cnt++;
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                continue;
+           
+            }
+            if (resRec.getIsError()) {
+                System.out.printf("\n!!!!!!!!!!!!!Message dequeue error, error: %s, %d!!!!!!!!!!!!!!\n", resRec.getError(),cnt);
+              
+                 //   Thread.sleep(100);               
+                continue;
+                }
+            else{
+                System.out.printf("\n!!!!!!!!!!!!!Message dequeue %s, %d!!!!!!!!!!!!!!\n", resRec.getMessage().getMessageID(),cnt);
+                resRec = resRec.ack();
+                resRec = tran.ExtendVisibility(1);
+                if (resRec.getIsError()) {
+                    
+                    System.out.printf("\n!!!!!!!!!!!!!Message dequeue error, error: %s, %d!!!!!!!!!!!!!!\n", resRec.getError(),cnt);
+                    continue; 
+                }             
+                resRec = tran.RejectMessage();
+                if (resRec.getIsError()) {
+                  
+                    System.out.printf("\n!!!!!!!!!!!!!Message dequeue error, error: %s, %d!!!!!!!!!!!!!!\n", resRec.getError(),cnt);
+                    continue; 
+                }
+            }
+}
+}
+
+    
 
     private static void Transactional_Queue_Ack_BAD()
             throws ServerAddressNotSuppliedException, ClassNotFoundException, IOException, InterruptedException {
@@ -174,7 +276,7 @@ public class Program {
         Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
         Collection<Message> batch = new ArrayList<Message>();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10000; i++) {
             batch.add(new Message().setBody(Converter.ToByteArray("Batch Message " + i)));
         }
 

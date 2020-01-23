@@ -52,7 +52,7 @@ public class Transaction extends GrpcClient {
     protected StreamQueueMessagesResponse latestMsg;
     private StreamObserver<StreamQueueMessagesResponse> respStreamObserver;
     private StreamObserver<StreamQueueMessagesRequest> reqStreamObserver;
-    ErrorObserver testerror;
+    ErrorObserver errorObserver;
 
     private final Object lock = new Object();
     boolean visibilityExp;
@@ -93,8 +93,8 @@ public class Transaction extends GrpcClient {
      */
 
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds,
-            ErrorObserver errorobs) throws ServerAddressNotSuppliedException, IOException {
-        testerror = errorobs;
+            ErrorObserver msgExpired) throws ServerAddressNotSuppliedException, IOException {
+        errorObserver = msgExpired;
         if (state != TranState.Ready) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -275,7 +275,7 @@ public class Transaction extends GrpcClient {
                             latestMsg = value;
                             visibilityExp = true;
                             onCompleted();
-                            testerror.onNext(new Error(value.getError()));
+                            errorObserver.onNext(new Error(value.getError()));
                             // send error
                             return;
                         } else {

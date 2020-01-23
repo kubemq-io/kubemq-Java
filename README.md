@@ -20,11 +20,11 @@ KubeMQ-SDK-Java works with JDK 8+
 ### Installing
 
 The recommended way to use the SDK for Java in your project is to consume it from Maven.
-https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/sdk/kubemq-sdk-Java/1.0.1/kubemq-sdk-Java-1.0.1.jar
+https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/sdk/kubemq-sdk-Java/1.0.2/kubemq-sdk-Java-1.0.2.jar
 To build with Gradle, add the dependency below to your build.gradle file.
 
 ``` java
-compile group: 'io.kubemq.sdk', name: 'kubemq-java-sdk', version: '1.0.1'
+compile group: 'io.kubemq.sdk', name: 'kubemq-java-sdk', version: '1.0.2'
 ```
 
 ## Configurations
@@ -256,7 +256,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       System.out.printf("AckAllQueueMessagesResponse error, error: %s", resAck.getError());
       return;
   }
-  System.out.printf("Ack All Messages: %d completed", resAck.getAffectedMessages());
+  System.out.printf("Ack All Messages: %s completed", resAck.getAffectedMessages());
 ```
 
 ### Transactional Queue - Ack
@@ -269,7 +269,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       System.out.printf("Message dequeue error, error: %s", resRec.getError());
       return;
   }
-  System.out.printf("MessageID: %d, Body: %s", resRec.getMessage().getMessageID(),
+  System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
           Converter.FromByteArray(resRec.getMessage().getBody()));
   System.out.println("Doing some work.....");
 
@@ -291,7 +291,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       System.out.printf("Message dequeue error, error: %s", resRec.getError());
       return;
   }
-  System.out.printf("MessageID: %d, Body: %s", resRec.getMessage().getMessageID(),
+  System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
           Converter.FromByteArray(resRec.getMessage().getBody()));
   System.out.println("Reject message");
   TransactionMessagesResponse resRej = tran.RejectMessage();
@@ -311,7 +311,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       System.out.printf("Message dequeue error, error: %s", resRec.getError());
       return;
   }
-  System.out.printf("MessageID: %d, Body: %s", resRec.getMessage().getMessageID(),
+  System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
           Converter.FromByteArray(resRec.getMessage().getBody()));
   System.out.println("work for 1 seconds");
   Thread.sleep(1000);
@@ -342,7 +342,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       System.out.printf("Message dequeue error, error: %s", resRec.getError());
       return;
   }
-  System.out.printf("MessageID: %d, Body:%s", resRec.getMessage().getMessageID(),
+  System.out.printf("MessageID: %s, Body:%s", resRec.getMessage().getMessageID(),
           Converter.FromByteArray(resRec.getMessage().getBody()));
   TransactionMessagesResponse resMod = tran
           .Modify(resRec.getMessage().setQueue("receiverB").setMetadata("new meatdata"));
@@ -361,7 +361,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       System.out.printf("Message dequeue error, error: %s", resRec.getError());
       return;
   }
-  System.out.printf("MessageID: %d, Body:%s", resRec.getMessage().getMessageID(),
+  System.out.printf("MessageID: %s, Body:%s", resRec.getMessage().getMessageID(),
           Converter.FromByteArray(resRec.getMessage().getBody()));
 
   System.out.println("Resend to new queue");
@@ -448,7 +448,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
       @Override
       public void onNext(EventReceive value) {
           try {
-              System.out.printf("Event Received: EventID: %d, Channel: %s, Metadata: %s, Body: %s",
+              System.out.printf("Event Received: EventID: %s, Channel: %s, Metadata: %s, Body: %s",
                       value.getEventId(), value.getChannel(), value.getMetadata(),
                       Converter.FromByteArray(value.getBody()));
           } catch (ClassNotFoundException e) {
@@ -661,7 +661,7 @@ The response can be successful or not. This is the responsibility of the respond
       System.out.printf("Response error: %s", result.getError());
       return;
   }
-  System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
+  System.out.printf("Response Received: %s, ExecutedAt: %s", result.getRequestID(), result.getTimestamp());
 ```
 
 ### Sending Command Request Async  
@@ -768,7 +768,7 @@ The response must include metadata or body together with an indication of succes
       System.out.printf("Response error: %s", result.getError());
       return;
   }
-  System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
+  System.out.printf("Response Received: %s, ExecutedAt: %s", result.getRequestID(), result.getTimestamp());
 ```
 
 ### Sending Query Requests async
@@ -792,7 +792,7 @@ The response must include metadata or body together with an indication of succes
           if (!value.isExecuted()) {
 
               System.out.printf("Response error: %s", value.getError());
-              System.out.printf("Response Received: %s, ExecutedAt %d", value.getRequestID(),
+              System.out.printf("Response Received: %s, ExecutedAt %s", value.getRequestID(),
                       value.getTimestamp());
           }
 
