@@ -180,8 +180,7 @@ public class Program {
                 }
             else{
                 System.out.printf("\n!!!!!!!!!!!!!Message dequeue %s, %d!!!!!!!!!!!!!!\n", resRec.getMessage().getMessageID(),cnt);
-                resRec = resRec.ack();
-                resRec = tran.ExtendVisibility(1);
+                 resRec = tran.ExtendVisibility(1);
                 if (resRec.getIsError()) {
                     
                     System.out.printf("\n!!!!!!!!!!!!!Message dequeue error, error: %s, %d!!!!!!!!!!!!!!\n", resRec.getError(),cnt);
