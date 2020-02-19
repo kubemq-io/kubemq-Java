@@ -41,7 +41,7 @@ import java.util.Iterator;
 public class Subscriber extends GrpcClient {
 
     private static Logger logger = LoggerFactory.getLogger(Subscriber.class);
-
+ 
     /**
      * Initialize a new Subscriber to incoming messages KubeMQAddress will be parsed
      * from Config or environment parameter
@@ -57,6 +57,18 @@ public class Subscriber extends GrpcClient {
      */
     public Subscriber(String KubeMQAddress) {
         _kubemqAddress = KubeMQAddress;
+    }
+
+      /**
+     * Initialize a new Subscriber to incoming messages
+     *
+     * @param KubeMQAddress KubeMQ server address
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.
+     */
+    public Subscriber(String KubeMQAddress, String authToken) {
+        _kubemqAddress = KubeMQAddress;
+        this.addAuthToken(authToken);
     }
 
     /**

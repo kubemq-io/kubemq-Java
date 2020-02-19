@@ -50,35 +50,7 @@ public class Queue extends GrpcClient {
     private Transaction transaction;
     private static Logger logger = LoggerFactory.getLogger(Queue.class);
 
-    /**
-     * Distributed durable FIFO based queues with the following core
-     * 
-     * @param queueName                        Represents The FIFO queue name to
-     *                                         send to using the KubeMQ.
-     * @param clientID                         Represents the sender ID that the
-     *                                         messages will be send under.
-     * @param maxNumberOfMessagesQueueMessages Number of received messages in
-     *                                         request.
-     * @param waitTimeSecondsQueueMessages     Wait time for received messages.
-     * @param kubeMQAddress                    The address the of the KubeMQ
-     *                                         including the GRPC Port ,Example:
-     *                                         "LocalHost:50000".
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
-     *                                           determined.
-     */
-    public Queue(String queueName, String clientID, Integer maxNumberOfMessagesQueueMessages,
-            Integer waitTimeSecondsQueueMessages, String kubeMQAddress)
-            throws SSLException, ServerAddressNotSuppliedException {
-        this.queueName = queueName;
-        this.clientID = clientID;
-        this._kubemqAddress = kubeMQAddress;
-        this.maxNumberOfMessagesQueueMessages = maxNumberOfMessagesQueueMessages;
-        this.waitTimeSecondsQueueMessages = waitTimeSecondsQueueMessages;
-        this.Ping();
-    }
-
+       
     /**
      * Distributed durable FIFO based queues with the following core
      * 
@@ -98,6 +70,31 @@ public class Queue extends GrpcClient {
         this.queueName = queueName;
         this.clientID = clientID;
         this._kubemqAddress = kubeMQAddress;
+        this.Ping();
+    }
+
+    /**
+     * Distributed durable FIFO based queues with the following core
+     * 
+     * @param queueName     Represents The FIFO queue name to send to using the
+     *                      KubeMQ.
+     * @param clientID      Represents the sender ID that the messages will be send
+     *                      under.
+     * @param kubeMQAddress The address the of the KubeMQ including the GRPC Port
+     *                      ,Example: "LocalHost:50000".
+    * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection. 
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public Queue(String queueName, String clientID, String kubeMQAddress, String authToken)
+            throws SSLException, ServerAddressNotSuppliedException {
+        this.queueName = queueName;
+        this.clientID = clientID;
+        this._kubemqAddress = kubeMQAddress;
+        this.addAuthToken(authToken);
         this.Ping();
     }
 
@@ -276,8 +273,20 @@ public class Queue extends GrpcClient {
         return maxNumberOfMessagesQueueMessages;
     }
 
+
+
     /**
-     * Wait time for received messages, used as defult in peek and receive.
+     * Wait time for received messages, used as default in peek and receive.
+     * 
+     * @param maxNumberOfMessagesQueueMessages Number of returned messages, default
+     *                                         is 32
+     */
+    public void setMaxNumberOfMessagesQueueMessages(int maxNumberOfMessagesQueueMessages){
+        this.maxNumberOfMessagesQueueMessages = maxNumberOfMessagesQueueMessages;
+    }
+
+    /**
+     * Wait time for received messages, used as default in peek and receive.
      * 
      * @return Wait time in seconds.
      */

@@ -43,31 +43,61 @@ public class Channel {
     private boolean store;
     private boolean returnResult;
 
-    public Channel(ChannelParameters parameters) {
+    public Channel(ChannelParameters parameters) throws SSLException, ServerAddressNotSuppliedException {
         this(
                 parameters.getChannelName(),
                 parameters.getClientID(),
                 parameters.isStore(),
-                parameters.getKubeMQAddress()
+                parameters.getKubeMQAddress(),
+                parameters.getAuthToken()
         );
     }
 
     /**
-     * Initializes a new instance of the MessageChannel class using a set of parameters.
+     * Initializes a new instance of the MessageChannel class using a set of
+     * parameters.
      *
      * @param channelName   Represents The channel name to send to using the KubeMQ.
-     * @param clientID      Represents the sender ID that the messages will be send under.
+     * @param clientID      Represents the sender ID that the messages will be send
+     *                      under.
      * @param store         Represents if the messages should be set to persistence.
      * @param kubeMQAddress Represents The address of the KubeMQ server.
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.
+     * @throws ServerAddressNotSuppliedException
+     * @throws SSLException
      */
-    public Channel(String channelName, String clientID, boolean store, String kubeMQAddress) {
+    public Channel(String channelName, String clientID, boolean store, String kubeMQAddress, String authToken)
+            throws SSLException, ServerAddressNotSuppliedException {
         this.channelName = channelName;
         this.clientID = clientID;
-        this.store = store;
+        this.store = store;     
 
         isValid();
 
-        sender = new Sender(kubeMQAddress);
+        sender = new Sender(kubeMQAddress, authToken);
+    }
+
+      /**
+     * Initializes a new instance of the MessageChannel class using a set of
+     * parameters.
+     *
+     * @param channelName   Represents The channel name to send to using the KubeMQ.
+     * @param clientID      Represents the sender ID that the messages will be send
+     *                      under.
+     * @param store         Represents if the messages should be set to persistence.
+     * @param kubeMQAddress Represents The address of the KubeMQ server.    
+     * @throws ServerAddressNotSuppliedException
+     * @throws SSLException
+     */
+    public Channel(String channelName, String clientID, boolean store, String kubeMQAddress){
+        this.channelName = channelName;
+        this.clientID = clientID;
+        this.store = store;     
+
+        isValid();
+
+        sender = new Sender(kubeMQAddress, null);
     }
 
     /**

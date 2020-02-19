@@ -522,7 +522,7 @@ public class Program {
 
     }
 
-    private static void Sending_Events_Single_Event() throws IOException {
+    private static void Sending_Events_Single_Event() throws IOException, ServerAddressNotSuppliedException {
         String ChannelName = "testing_event_channel", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
 

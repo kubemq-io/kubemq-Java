@@ -79,6 +79,7 @@ public class Transaction extends GrpcClient {
     protected Transaction(Queue queue) throws ServerAddressNotSuppliedException {
         this.queue = queue;
         this._kubemqAddress = queue.getServerAddress();
+        this._metadata = queue.getMetadata();
     }
 
     /**

@@ -43,8 +43,9 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
 public class GrpcClient {
 
-    protected String _kubemqAddress;
+    protected String _kubemqAddress;    
     protected Metadata _metadata = null;
+    protected String _authToken = null;    
     private ManagedChannel channel = null;
     private kubemqGrpc.kubemqBlockingStub blockingStub = null;
     private kubemqGrpc.kubemqStub stub = null;
@@ -61,6 +62,22 @@ public class GrpcClient {
         this._kubemqAddress = value;
     }
 
+    public Metadata getMetadata(){
+        return this._metadata;
+    }
+
+    public void addAuthToken(String authToken){
+        if (authToken==null){
+            return;
+        }
+
+        if (this._metadata!=null){
+            _metadata = new Metadata();           
+        }
+        Metadata.Key<String> key = Metadata.Key.of("authToken", ASCII_STRING_MARSHALLER);
+        _metadata.put(key, authToken);
+    }
+
     protected kubemqGrpc.kubemqBlockingStub GetKubeMQClient() throws ServerAddressNotSuppliedException, SSLException {
         if (blockingStub == null) {
             // Open connection
@@ -69,6 +86,7 @@ public class GrpcClient {
             }
 
             blockingStub = constructBlockingClient(channel);
+            
             if (_metadata != null) {
                 blockingStub = MetadataUtils.attachHeaders(blockingStub, _metadata);
             }
@@ -92,7 +110,7 @@ public class GrpcClient {
 
         return stub;
     }
-
+ 
     public void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }

@@ -57,7 +57,19 @@ public class Initiator extends GrpcClient {
      * @param KubeMQAddress KubeMQ server address.
      */
     public Initiator(String KubeMQAddress) {
-        _kubemqAddress = KubeMQAddress;
+        this._kubemqAddress = KubeMQAddress;
+    }
+
+    /**
+     * Initialize a new Initiator to send requests and handle response.
+     *
+     * @param KubeMQAddress KubeMQ server address.
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.
+     */
+    public Initiator(String KubeMQAddress, String authToken) {
+       this._kubemqAddress = KubeMQAddress;
+       this.addAuthToken(authToken);
     }
 
     /**

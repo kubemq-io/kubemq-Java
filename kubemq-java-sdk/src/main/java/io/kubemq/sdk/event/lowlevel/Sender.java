@@ -39,31 +39,45 @@ import javax.net.ssl.SSLException;
 public class Sender extends GrpcClient {
 
     private static Logger logger = LoggerFactory.getLogger(Sender.class);
+    private String authToken;   
 
     /**
-     * Initialize a new Sender.
-     * KubeMQAddress will be parsed from Config or environment parameter.
+     * Initialize a new Sender. KubeMQAddress will be parsed from Config or
+     * environment parameter.
+     * 
+     * @throws ServerAddressNotSuppliedException
+     * @throws SSLException
      */
-    public Sender() {
-        this(null);
+    public Sender() throws SSLException, ServerAddressNotSuppliedException {
+        this(null,null);
     }
 
     /**
      * Initialize a new Sender under the requested KubeMQ Server Address.
      *
      * @param KubeMQAddress KubeMQ server address.
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.   
      */
-    public Sender(String KubeMQAddress) {
+    public Sender(String KubeMQAddress, String authToken) {
         this._kubemqAddress = KubeMQAddress;
+        this.addAuthToken(authToken);
+
+        
     }
+
+    
 
     /**
      * Publish a single message using the KubeMQ.
      *
      * @param notification Event to add to the queue
-     * @return io.kubemq.sdk.event.MessageDeliveryReport that contain info regarding message status.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @return io.kubemq.sdk.event.MessageDeliveryReport that contain info regarding
+     *         message status.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
     public Result SendEvent(Event notification) throws ServerAddressNotSuppliedException, SSLException {
         Kubemq.Event event = notification.ToInnerEvent();

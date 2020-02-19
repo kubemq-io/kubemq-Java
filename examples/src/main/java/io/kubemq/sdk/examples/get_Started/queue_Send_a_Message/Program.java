@@ -42,7 +42,9 @@ public class Program {
 
         Queue queue = null;
         try{
-            queue = new io.kubemq.sdk.queue.Queue(queueName,clientID,1,2,kubeMQServerAddress);
+            queue = new io.kubemq.sdk.queue.Queue(queueName,clientID,kubeMQServerAddress);
+            queue.setMaxNumberOfMessagesQueueMessages(2);
+            queue.setWaitTimeSecondsQueueMessages(1);
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");
         } catch (io.grpc.StatusRuntimeException e) {
