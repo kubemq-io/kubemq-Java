@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import javax.net.ssl.SSLException;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.Event;
 import io.kubemq.sdk.event.Result;
@@ -34,10 +35,11 @@ import io.kubemq.sdk.tools.Converter;
 
 public class Program {
 
-    public static void main(String[] args)  {
-        
-        String channelName = "testing_event_channel", clientID = "hello-world-subscriber", kubeMQAddress = "localhost:50000";
-    
+    public static void main(String[] args) {
+
+        String channelName = "testing_event_channel", clientID = "hello-world-subscriber",
+                kubeMQAddress = "localhost:50000";
+
         io.kubemq.sdk.event.Channel chan = new io.kubemq.sdk.event.Channel(channelName, clientID, false, kubeMQAddress);
 
         Event event = new Event();
@@ -47,13 +49,15 @@ public class Program {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         try {
             Result res = chan.SendEvent(event);
-        } catch (SSLException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+       
 
     }
 }

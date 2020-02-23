@@ -23,13 +23,14 @@
  */
 package io.kubemq.sdk.examples.commandqueryresponder;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
 
 public class Program {
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
         System.out.println();
         System.out.println("Starting ReqRepResponder...");
         System.out.println();
@@ -38,7 +39,7 @@ public class Program {
 
         try {
             new CommandQueryResponder();
-        } catch (io.grpc.StatusRuntimeException e) {
+        } catch (AuthorizationException e) {
             System.out.println("Error: KubeMQ is unreachable.");
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");

@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.examples.commandqueryresponder;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Responder;
 import io.kubemq.sdk.commandquery.Response;
@@ -39,15 +40,12 @@ class CommandQueryResponder extends BaseExample {
     private Responder.RequestResponseObserver HandleIncomingRequests;
     private Responder responder;
 
-    CommandQueryResponder() throws ServerAddressNotSuppliedException, SSLException {
+    CommandQueryResponder() throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
         super("CommandQueryResponder");
         responder = new Responder();
         HandleIncomingRequests = request -> {
-            this.logger.warn(MessageFormat.format(
-                    "Subscriber Received Event: Metadata:''{0}'', Channel:''{1}''",
-                    request.getMetadata(),
-                    request.getChannel()
-            ));
+            this.logger.warn(MessageFormat.format("Subscriber Received Event: Metadata:''{0}'', Channel:''{1}''",
+                    request.getMetadata(), request.getChannel()));
 
             Response response = new Response(request);
             response.setCacheHit(false);
@@ -63,12 +61,14 @@ class CommandQueryResponder extends BaseExample {
         CreateSubscribeToCommands();
     }
 
-    private void CreateSubscribeToCommands() throws ServerAddressNotSuppliedException, SSLException {
+    private void CreateSubscribeToCommands()
+            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.Queries);
         responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
     }
 
-    private void CreateSubscribeToQueries() throws ServerAddressNotSuppliedException, SSLException {
+    private void CreateSubscribeToQueries() throws ServerAddressNotSuppliedException, SSLException,
+        AuthorizationException {
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.Commands);
         responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
     }

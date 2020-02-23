@@ -43,9 +43,9 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
 public class GrpcClient {
 
-    protected String _kubemqAddress;    
+    protected String _kubemqAddress;
     protected Metadata _metadata = null;
-    protected String _authToken = null;    
+    protected String _authToken = null;
     private ManagedChannel channel = null;
     private kubemqGrpc.kubemqBlockingStub blockingStub = null;
     private kubemqGrpc.kubemqStub stub = null;
@@ -62,23 +62,29 @@ public class GrpcClient {
         this._kubemqAddress = value;
     }
 
-    public Metadata getMetadata(){
+    public Metadata getMetadata() {
         return this._metadata;
     }
 
-    public void addAuthToken(String authToken){
-        if (authToken==null){
+    public void addAuthToken(String authToken) {
+        if (authToken == null) {
             return;
         }
 
-        if (this._metadata!=null){
-            _metadata = new Metadata();           
+        if (this._metadata != null) {
+            _metadata = new Metadata();
         }
-        Metadata.Key<String> key = Metadata.Key.of("authToken", ASCII_STRING_MARSHALLER);
+        Metadata.Key<String> key = Metadata.Key.of("authorization", ASCII_STRING_MARSHALLER);
         _metadata.put(key, authToken);
     }
 
-    protected kubemqGrpc.kubemqBlockingStub GetKubeMQClient() throws ServerAddressNotSuppliedException, SSLException {
+    /**
+     *  
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
+     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     */
+    protected kubemqGrpc.kubemqBlockingStub GetKubeMQClient()
+            throws ServerAddressNotSuppliedException, SSLException {
         if (blockingStub == null) {
             // Open connection
             if (channel == null) {
@@ -86,7 +92,7 @@ public class GrpcClient {
             }
 
             blockingStub = constructBlockingClient(channel);
-            
+
             if (_metadata != null) {
                 blockingStub = MetadataUtils.attachHeaders(blockingStub, _metadata);
             }
@@ -95,7 +101,13 @@ public class GrpcClient {
         return blockingStub;
     }
 
-    protected kubemqGrpc.kubemqStub GetKubeMQAsyncClient() throws ServerAddressNotSuppliedException, SSLException {
+     /**
+     *  
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
+     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.   
+     */
+    protected kubemqGrpc.kubemqStub GetKubeMQAsyncClient()
+            throws ServerAddressNotSuppliedException, SSLException {
         if (stub == null) {
             // Open connection
             if (channel == null) {
@@ -110,13 +122,14 @@ public class GrpcClient {
 
         return stub;
     }
- 
+
     public void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 
     /**
-     * Construct blockingStub connecting to KubeMQ server at {@code host} (host:port).
+     * Construct blockingStub connecting to KubeMQ server at {@code host}
+     * (host:port).
      *
      * @return io.grpc.ManagedChannel object used to access the KubeMQ server
      */
@@ -131,18 +144,10 @@ public class GrpcClient {
 
         if (!StringUtils.isBlank(clientCertFile)) {
             return NettyChannelBuilder.forTarget(kubemqAddress)
-                    .sslContext(
-                            GrpcSslContexts
-                                    .forClient()
-                                    .trustManager(new File(clientCertFile))
-                                    .build()
-                    )
-                    .build();
+                    .sslContext(GrpcSslContexts.forClient().trustManager(new File(clientCertFile)).build()).build();
         } else {
             // Open Insecure connection
-            return ManagedChannelBuilder.forTarget(kubemqAddress)
-                    .usePlaintext()
-                    .build();
+            return ManagedChannelBuilder.forTarget(kubemqAddress).usePlaintext().build();
         }
     }
 
@@ -151,7 +156,8 @@ public class GrpcClient {
     }
 
     /**
-     * Construct blocking blockingStub for accessing KubeMQ server using the existing {@code channel}
+     * Construct blocking blockingStub for accessing KubeMQ server using the
+     * existing {@code channel}
      *
      * @param channel Client channel connecting to KubeMQ server
      * @return BlockingStub for accessing KubeMQ server
@@ -161,13 +167,14 @@ public class GrpcClient {
     }
 
     /**
-     * Construct async blockingStub for accessing KubeMQ server using the existing {@code channel}
+     * Construct async blockingStub for accessing KubeMQ server using the existing
+     * {@code channel}
      *
      * @param channel Client channel connecting to KubeMQ server
      * @return Stub for accessing KubeMQ server
      */
     private kubemqGrpc.kubemqStub constructAsyncClient(ManagedChannel channel) {
-        return kubemqGrpc.newStub(channel);
+        return kubemqGrpc.newStub(channel);  
     }
 
     private String getKubeMQAddress() throws ServerAddressNotSuppliedException {
@@ -178,7 +185,7 @@ public class GrpcClient {
         _kubemqAddress = ConfigurationLoader.GetServerAddress();
 
         if (StringUtils.isBlank(_kubemqAddress)) {
-            throw new ServerAddressNotSuppliedException();
+            throw new ServerAddressNotSuppliedException ();
         }
 
         return _kubemqAddress;

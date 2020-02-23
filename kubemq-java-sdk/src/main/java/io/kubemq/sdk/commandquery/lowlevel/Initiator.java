@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.commandquery.lowlevel;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Response;
@@ -107,16 +108,25 @@ public class Initiator extends GrpcClient {
      * @return the response that received from the KubeMQ server for the request that was sent.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
      * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws AuthorizationException           Authorization KubeMQ token to be used for KubeMQ connection.
      */
-    public Response SendRequest(Request request) throws ServerAddressNotSuppliedException, SSLException {
+    public Response SendRequest(Request request) throws SSLException, ServerAddressNotSuppliedException, AuthorizationException {
 
         Kubemq.Request innerRequest = request.Convert();
 
         // Send request and wait for response
+        try {
+            
+       
         Kubemq.Response innerResponse = GetKubeMQClient().sendRequest(innerRequest);
+        return new Response(innerResponse);
+      
+        } catch (io.grpc.StatusRuntimeException e) {
+            throw new AuthorizationException();
+        }
 
         // convert InnerResponse to Response and return response to end user
-        return new Response(innerResponse);
+       
     }
 
     private void LogRequest(Request request) {

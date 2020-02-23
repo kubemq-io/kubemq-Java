@@ -23,15 +23,12 @@
  */
 package io.kubemq.sdk.queue;
 
-import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.concurrent.Semaphore;
-
 import javax.net.ssl.SSLException;
 
-import com.fasterxml.jackson.core.util.BufferRecycler;
-
 import io.grpc.stub.StreamObserver;
+import io.kubemq.sdk.Exceptions.AuthorizationException;
+import io.kubemq.sdk.Exceptions.TransactionException;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
@@ -60,7 +57,7 @@ public class Transaction extends GrpcClient {
     TranState state = TranState.Ready;
 
     private enum TranState {
-        Ready, StreamRegistered, StreamOpened, StreamClosing, StreamClosed, InTransaction
+        Ready, StreamRegistered, StreamOpened, StreamClosing, StreamClosed, InTransaction, UNAUTHENTICATED
 
     }
 
@@ -87,14 +84,22 @@ public class Transaction extends GrpcClient {
      * 
      * @param visibilitySeconds message access lock by receiver.
      * @param waitTimeSeconds   Wait time of request., default is from queue
+     * @param msgExpired        Async StreamObserver to handle transaction
+     *                          expiration.
      * @return Transaction response
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException                       Error in response from stream
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
 
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds,
-            ErrorObserver msgExpired) throws ServerAddressNotSuppliedException, IOException {
+            ErrorObserver msgExpired)
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
         errorObserver = msgExpired;
         if (state != TranState.Ready) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
@@ -112,8 +117,23 @@ public class Transaction extends GrpcClient {
 
     }
 
+    /**
+     * Receive queue messages request , waiting for response or timeout.
+     * 
+     * @param visibilitySeconds message access lock by receiver.
+     * @param waitTimeSeconds   Wait time of request., default is from queue
+     * @return Transaction response
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     */
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
-            throws ServerAddressNotSuppliedException, IOException {
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
 
         if (state != TranState.Ready) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
@@ -135,11 +155,17 @@ public class Transaction extends GrpcClient {
      * Will mark Message dequeued on queue.
      * 
      * @return Transaction response.
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException                       Error in response from stream
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public TransactionMessagesResponse AckMessage() throws ServerAddressNotSuppliedException, IOException {
+    public TransactionMessagesResponse AckMessage()
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -158,11 +184,17 @@ public class Transaction extends GrpcClient {
      * Will return message to queue.
      * 
      * @return Transaction response.
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException                       Error in response from stream
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public TransactionMessagesResponse RejectMessage() throws ServerAddressNotSuppliedException, IOException {
+    public TransactionMessagesResponse RejectMessage()
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -188,12 +220,19 @@ public class Transaction extends GrpcClient {
      * 
      * @param visibilitySeconds New viability time.
      * @return Transaction response.
+     * 
+     * @return Transaction response.
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException                       Error in response from stream
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
-            throws ServerAddressNotSuppliedException, IOException {
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -215,11 +254,18 @@ public class Transaction extends GrpcClient {
      * 
      * @param queueName Resend queue name.
      * @return Transaction response.
+     * 
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException                       Error in response from stream
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public TransactionMessagesResponse ReSend(String queueName) throws ServerAddressNotSuppliedException, IOException {
+    public TransactionMessagesResponse ReSend(String queueName)
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -239,11 +285,17 @@ public class Transaction extends GrpcClient {
      * 
      * @param message New message
      * @return Transaction response.
+     * @throws TransactionException              Transaction return message is
+     *                                           missing.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws IOException                       Error in response from stream
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
      */
-    public TransactionMessagesResponse Modify(Message message) throws ServerAddressNotSuppliedException, IOException {
+    public TransactionMessagesResponse Modify(Message message)
+            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -308,63 +360,75 @@ public class Transaction extends GrpcClient {
 
             @Override
             public void onError(Throwable t) {
-                state = TranState.StreamClosing;
-                onCompleted();
+                if (t.getMessage().contains("UNAUTHENTICATED")) {
+                    state = TranState.UNAUTHENTICATED;
+                } else {
+                    state = TranState.StreamClosing;
                 }
+                onCompleted();
 
-                @Override
-                public void onCompleted() { 
-                  if(state !=TranState.StreamClosed)  {
+            }
+
+            @Override
+            public void onCompleted() {
+                if (state != TranState.StreamClosed) {
                     synchronized (lock) {
-                        state =TranState.StreamClosed;                   
-                        if(msg!=null){
-                           msg = null;
-                        } 
+                        if (state != TranState.UNAUTHENTICATED) {
+                            state = TranState.StreamClosed;
+                        }
+                        if (msg != null) {
+                            msg = null;
+                        }
                         lock.notify();
                     }
                 }
-                  
-                }
-            };        
+
+            }
+        };
         return true;
     }
 
     private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr)
-            throws SSLException, ServerAddressNotSuppliedException
-       {
+            throws SSLException, ServerAddressNotSuppliedException, AuthorizationException
 
-    
-        if (reqStreamObserver == null) {       
-            state = TranState.StreamRegistered;   
-            reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);          
-           
-        }else
-        {
-            
+    {
+
+        if (reqStreamObserver == null) {
+            state = TranState.StreamRegistered;
+            reqStreamObserver = GetKubeMQAsyncClient().streamQueueMessage(respStreamObserver);
+
+        } else {
+
         }
-         
-        reqStreamObserver.onNext(sr);  
-        
+
+        reqStreamObserver.onNext(sr);
+
         synchronized (lock) {
             while (true) {
                 try {
-                    lock.wait();                              
-                    if (state != TranState.InTransaction){ 
+                    lock.wait();
+                    if (state != TranState.InTransaction) {
+                        if (state == TranState.UNAUTHENTICATED) {
+                            throw new AuthorizationException();
+                        }
                         return latestMsg;
 
-                    }
-                    else{
+                    } else {
                         break;
-                    }                   
+                    }
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     return null;
+                } catch (AuthorizationException e) {
+                    e.printStackTrace();
+                    throw e;
                 }
-                finally{
-                    
+
+                finally {
+
                 }
-            }         
+            }
         }
         return latestMsg;
     }

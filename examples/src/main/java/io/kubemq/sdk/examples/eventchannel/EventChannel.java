@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.examples.eventchannel;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.Channel;
 import io.kubemq.sdk.event.ChannelParameters;
@@ -33,7 +34,7 @@ import javax.net.ssl.SSLException;
 
 class EventChannel extends BaseExample {
 
-    EventChannel() throws ServerAddressNotSuppliedException, SSLException {
+    EventChannel() throws SSLException, AuthorizationException, ServerAddressNotSuppliedException {
         super("EventChannel");
         ChannelParameters channelParameters = CreateMessageChannelParam();
         Channel channel = new Channel(channelParameters);

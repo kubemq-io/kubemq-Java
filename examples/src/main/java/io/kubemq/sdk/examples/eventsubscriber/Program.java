@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.examples.eventsubscriber;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 
 import javax.net.ssl.SSLException;
@@ -39,7 +40,7 @@ public class Program {
 
         try {
             new EventSubscriber();
-        } catch (io.grpc.StatusRuntimeException e) {
+        } catch (AuthorizationException e) {
             System.out.println("Error: KubeMQ is unreachable.");
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");

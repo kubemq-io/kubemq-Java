@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.commandquery;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.lowlevel.Initiator;
 import io.kubemq.sdk.commandquery.lowlevel.Request;
@@ -156,10 +157,11 @@ public class Channel {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
+     *                                           detected by an SSL subsystem.   
      */
     public void SendRequestAsync(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams,
-            final StreamObserver<Response> response) throws ServerAddressNotSuppliedException, SSLException {
+            final StreamObserver<Response> response)
+            throws ServerAddressNotSuppliedException, SSLException {
         _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams), response);
     }
 
@@ -173,10 +175,17 @@ public class Channel {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      */
     public Response SendRequest(io.kubemq.sdk.commandquery.Request request)
-            throws ServerAddressNotSuppliedException, SSLException {
-        return _initiator.SendRequest(CreateLowLevelRequest(request));
+            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
+        try {
+            return _initiator.SendRequest(CreateLowLevelRequest(request));
+        } catch (io.grpc.StatusRuntimeException e) {
+            throw new AuthorizationException();
+        }
+
     }
 
     /**
@@ -191,10 +200,16 @@ public class Channel {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      */
     public Response SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams)
-            throws ServerAddressNotSuppliedException, SSLException {
-        return _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams));
+            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
+        try {
+            return _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams));
+        } catch (io.grpc.StatusRuntimeException e) {
+            throw new AuthorizationException();
+        }
     }
 
     /**
@@ -207,7 +222,7 @@ public class Channel {
      *                                           detected by an SSL subsystem.
      */
     public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
-       return _initiator.Ping();
+        return _initiator.Ping();
     }
 
     private void isValid() {
@@ -218,10 +233,8 @@ public class Channel {
             throw new IllegalArgumentException("Invalid Request Type");
         }
         if (timeout < 0) {
-            throw new IllegalArgumentException(MessageFormat.format(
-                    "Parameter timeout must be between 1 and {0}",
-                    Integer.MAX_VALUE
-            ));
+            throw new IllegalArgumentException(
+                    MessageFormat.format("Parameter timeout must be between 1 and {0}", Integer.MAX_VALUE));
         }
     }
 
@@ -242,8 +255,8 @@ public class Channel {
         return innerRequest;
     }
 
-
-    private Request CreateLowLevelRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams) {
+    private Request CreateLowLevelRequest(io.kubemq.sdk.commandquery.Request request,
+            RequestParameters overrideParams) {
         Request req = CreateLowLevelRequest(request);
 
         if (overrideParams.getTimeout() != null) {
@@ -300,6 +313,5 @@ public class Channel {
     public void setCacheTTL(int cacheTTL) {
         this.cacheTTL = cacheTTL;
     }
-
 
 }

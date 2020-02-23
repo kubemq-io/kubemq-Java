@@ -75,15 +75,20 @@ public class Program {
 
             }
         };
-        try {
+       
+            try {
             subscriber.SubscribeToEvents(subscribeRequest, streamObserver);
-        } catch (SSLException e) {
-            System.out.printf("SSLException: %s", e.toString());
-            e.printStackTrace();
-        } catch (ServerAddressNotSuppliedException e) {
-            System.out.printf("ServerAddressNotSuppliedException: %s", e.toString());
-			e.printStackTrace();
-		}
+        } catch (SSLException | ServerAddressNotSuppliedException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+     
+        
+        try {
+            int read = System.in.read();
+        } catch (IOException e) {
+            System.out.println("Error:  I/O error occurred.");
+        }
        
     }
 }

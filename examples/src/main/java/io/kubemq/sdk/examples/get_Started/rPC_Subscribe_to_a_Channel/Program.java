@@ -26,8 +26,10 @@ package io.kubemq.sdk.examples.get_Started.rPC_Subscribe_to_a_Channel;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import javax.naming.AuthenticationException;
 import javax.net.ssl.SSLException;
 
+import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Responder;
 import io.kubemq.sdk.commandquery.Response;
@@ -63,13 +65,11 @@ public class Program {
 
                 try {
                     responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
-                } catch (SSLException e) {
-                    System.out.printf("SSLException:%s", e.getMessage());
-                    e.printStackTrace();
-                } catch (ServerAddressNotSuppliedException e) {
-                    System.out.printf("ServerAddressNotSuppliedException:%s", e.getMessage());
+                } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                  
             }
         }.start();
     }

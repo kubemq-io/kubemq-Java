@@ -37,15 +37,14 @@ public class Program {
         System.out.println("Press 'Enter' to stop the application...");
         System.out.println();
 
-        try {
+  
+            try {
             new CommandQueryChannel();
-        } catch (ServerAddressNotSuppliedException e) {
-            System.out.println("Error: Can not determine KubeMQ server address.");
-        } catch (io.grpc.StatusRuntimeException e) {
-            System.out.println("Error: KubeMQ is unreachable.");
-        } catch (SSLException e) {
-            System.out.println("Error: error detected by an SSL subsystem");
+        } catch (SSLException | ServerAddressNotSuppliedException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
+       
 
         try {
             int read = System.in.read();
