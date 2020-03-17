@@ -2,9 +2,6 @@
 
 The **KubeMQ SDK for Java** enables Java developers to communicate with [KubeMQ](https://kubemq.io/) server.
 
-## Table of Content
-[[toc]]
-
 ## General SDK description
 The SDK implements all communication patterns available through the KubeMQ server:
 - Events
@@ -20,7 +17,7 @@ KubeMQ-SDK-Java works with JDK 8+
 ### Installing
 
 The recommended way to use the SDK for Java in your project is to consume it from Maven.
-https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/sdk/kubemq-sdk-Java/1.0.1/kubemq-sdk-Java-1.0.1.jar
+https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/sdk/kubemq-sdk-Java/0.1.6/kubemq-sdk-Java-0.1.6.jar
 To build with Gradle, add the dependency below to your build.gradle file.
 
 ``` java
@@ -132,7 +129,7 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
 - RPC and Stream Flow - RPC flow allows an insert and pulls messages in one call. Stream flow allows single message consuming in a transactional way
 - Message Policy - Each message can be configured with expiration and delay timers. Also, each message can specify a dead-letter queue for un-processed messages attempts
 - Long Polling - Consumers can wait until a message available in the queue to consume
-- Peak Messages - Consumers can peak into a queue without removing them from the queue
+- Peak Messages - Consumers can peek into a queue without removing them from the queue
 - Ack All Queue Messages - Any client can mark all the messages in a queue as discarded and will not be available anymore to consume
 - Visibility timers - Consumers can pull a message from the queue and set a timer which will cause the message not be visible to other consumers. This timer can be extended as needed.
 - Resend Messages - Consumers can send back a message they pulled to a new queue or send a modified message to the same queue for further processing.
@@ -147,9 +144,9 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
   if (resSend.getIsError()) {
       System.out.printf("Message enqueue error, error: %s", resSend.getError());
   }
-```    
+```
 
- ### Send Message to a Queue with Expiration 
+ ### Send Message to a Queue with Expiration
 
 ```java
   Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
@@ -477,21 +474,21 @@ KubeMQ supports distributed durable FIFO based queues with the following core fe
 
 ## Event Store
 
-### Subscription Options  
+### Subscription Options
 
-KubeMQ supports 6 types of subscriptions:  
+KubeMQ supports 6 types of subscriptions:
 
-- StartFromNewEvents - start event store subscription with only new events  
+- StartFromNewEvents - start event store subscription with only new events
 
-- StartFromFirstEvent - replay all the stored events from the first available sequence and continue stream new events from this point  
+- StartFromFirstEvent - replay all the stored events from the first available sequence and continue stream new events from this point
 
-- StartFromLastEvent - replay the last event and continue stream new events from this point  
+- StartFromLastEvent - replay the last event and continue stream new events from this point
 
-- StartFromSequence - replay events from specific event sequence number and continue stream new events from this point  
+- StartFromSequence - replay events from specific event sequence number and continue stream new events from this point
 
-- StartFromTime - replay events from specific time continue stream new events from this point  
+- StartFromTime - replay events from specific time continue stream new events from this point
 
-- StartFromTimeDelta - replay events from specific current time - delta duration in seconds, continue stream new events from this point  
+- StartFromTimeDelta - replay events from specific current time - delta duration in seconds, continue stream new events from this point
 ### Sending Event Store
 
 #### Single Event Store
@@ -602,9 +599,9 @@ KubeMQ supports 6 types of subscriptions:
 ### Concept
 
 Commands implement synchronous messaging pattern which the sender send a request and wait for a specific amount of time to get a response.  
-The response can be successful or not. This is the responsibility of the responder to return with the result of the command within the time the sender set in the request  
+The response can be successful or not. This is the responsibility of the responder to return with the result of the command within the time the sender set in the request
 
-#### Receiving Commands Requests  
+#### Receiving Commands Requests
 ```java
   String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
           KubeMQServerAddress = "localhost:50000";
@@ -664,7 +661,7 @@ The response can be successful or not. This is the responsibility of the respond
   System.out.printf("Response Received: %s, ExecutedAt: %d", result.getRequestID(), result.getTimestamp());
 ```
 
-### Sending Command Request Async  
+### Sending Command Request Async
 
 ```java
   String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
@@ -704,7 +701,7 @@ The response can be successful or not. This is the responsibility of the respond
 
 ### Concept
 
-Queries implement synchronous messaging pattern which the sender send a request and wait for a specific amount of time to get a response.  
+Queries implement synchronous messaging pattern which the sender send a request and wait for a specific amount of time to get a response.
 
 The response must include metadata or body together with an indication of successful or not operation. This is the responsibility of the responder to return with the result of the query within the time the sender set in the request.
 
