@@ -62,8 +62,6 @@ public class Sender extends GrpcClient {
     public Sender(String KubeMQAddress, String authToken) {
         this._kubemqAddress = KubeMQAddress;
         this.addAuthToken(authToken);
-
-        
     }
 
     

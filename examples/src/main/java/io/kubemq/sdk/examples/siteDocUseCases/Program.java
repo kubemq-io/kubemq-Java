@@ -58,37 +58,37 @@ public class Program {
     public static void main(String[] args)
             throws ServerAddressNotSuppliedException, IOException, ClassNotFoundException, InterruptedException {
 
-        // Ack_All_Messages_In_a_Queue();
-        // Send_Message_to_a_Queue();
-        // Send_Message_to_a_Queue_with_Expiration();
-        // Send_Message_to_a_Queue_with_Delay();
-        // Send_Message_to_a_Queue_with_DeadLetter_Queue();
-        // Send_Batch_Messages();
-        // Receive_Messages_from_a_Queue();
-        // Peek_Messages_from_a_Queue();
-        // Transactional_Queue_Ack_BAD();
-        // Transactional_Queue_Ack();
-        // Transactional_Queue_Reject();
-        // Transactional_Queue_Extend_Visibility();
-        // Transactional_Queue_Resend_to_New_Queue();
-        // Transactional_Queue_Resend_Modified_Message();
+        Ack_All_Messages_In_a_Queue();
+        Send_Message_to_a_Queue();
+        Send_Message_to_a_Queue_with_Expiration();
+        Send_Message_to_a_Queue_with_Delay();
+        Send_Message_to_a_Queue_with_DeadLetter_Queue();
+        Send_Batch_Messages();
+        Receive_Messages_from_a_Queue();
+        Peek_Messages_from_a_Queue();
+        Transactional_Queue_Ack_BAD();
+        Transactional_Queue_Ack();
+        Transactional_Queue_Reject();
+        Transactional_Queue_Extend_Visibility();
+        Transactional_Queue_Resend_to_New_Queue();
+        Transactional_Queue_Resend_Modified_Message();
 
-        // Receiving_Events();
-        // Sending_Events_Single_Event();
-        // Sending_Events_Stream_Events();
+        Receiving_Events();
+        Sending_Events_Single_Event();
+        Sending_Events_Stream_Events();
 
-        // Receiving_Events_Store();
-        // Sending_Events_Store_Single_Event_to_Store();
-        // Sending_Events_Store_Stream_Events_Store();
+        Receiving_Events_Store();
+        Sending_Events_Store_Single_Event_to_Store();
+        Sending_Events_Store_Stream_Events_Store();
 
         Commands_Receiving_Commands_Requests();
-        // Commands_Sending_Command_Request();
-        // Commands_Sending_Command_Request_async();
+        Commands_Sending_Command_Request();
+        Commands_Sending_Command_Request_async();
 
-        // Queries_Receiving_Query_Requests();
-        // Queries_Sending_Query_Request();
-        // Queries_Sending_Query_Request_async();
-        // Transactional_Queue_Reject_Loop();
+        Queries_Receiving_Query_Requests();
+        Queries_Sending_Query_Request();
+        Queries_Sending_Query_Request_async();
+        Transactional_Queue_Reject_Loop();
 
         try {
             int read = System.in.read();
@@ -574,6 +574,7 @@ public class Program {
             @Override
             public void onError(Throwable t) {
                 System.out.printf("Event Received Error: %s", t.toString());
+                return;
             }
 
             @Override
