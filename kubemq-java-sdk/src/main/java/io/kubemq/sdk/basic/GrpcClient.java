@@ -71,7 +71,7 @@ public class GrpcClient {
             return;
         }
 
-        if (this._metadata != null) {
+        if (this._metadata == null) {
             _metadata = new Metadata();
         }
         Metadata.Key<String> key = Metadata.Key.of("authorization", ASCII_STRING_MARSHALLER);
@@ -124,7 +124,15 @@ public class GrpcClient {
     }
 
     public void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(5, TimeUnit.NANOSECONDS);
+    }
+
+    public void shutdownNow() {
+        channel.shutdownNow();
+    }
+  
+    public boolean isTerminated() {
+        return channel.isTerminated();
     }
 
     /**

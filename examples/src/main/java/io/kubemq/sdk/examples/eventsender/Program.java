@@ -23,7 +23,7 @@
  */
 package io.kubemq.sdk.examples.eventsender;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 
 import javax.net.ssl.SSLException;
@@ -42,9 +42,7 @@ public class Program {
             new EventSender();
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");
-        } catch (AuthorizationException e) {
-            System.out.println("Error: KubeMQ is unreachable.");
-        } catch (SSLException e) {
+        }  catch (SSLException e) {
             System.out.println("Error: error detected by an SSL subsystem");
         }
 

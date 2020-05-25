@@ -23,7 +23,7 @@
  */
 package io.kubemq.sdk.event;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.lowlevel.Sender;
 import io.kubemq.sdk.grpc.Kubemq.PingResult;
@@ -105,7 +105,7 @@ public class Channel {
      *                                           used for KubeMQ connection.
      */
     public Result SendEvent(Event event)
-            throws SSLException, AuthorizationException, ServerAddressNotSuppliedException {
+            throws SSLException,  ServerAddressNotSuppliedException {
         return sender.SendEvent(CreateLowLevelEvent(event));
     }
 

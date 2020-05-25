@@ -23,7 +23,7 @@
  */
 package io.kubemq.sdk.commandquery;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.lowlevel.Initiator;
 import io.kubemq.sdk.commandquery.lowlevel.Request;
@@ -58,7 +58,7 @@ public class Channel {
     public Channel(ChannelParameters parameters) {
         this(parameters.getRequestType(), parameters.getChannelName(), parameters.getClientID(),
                 parameters.getTimeout(), parameters.getCacheKey(), parameters.getCacheTTL(),
-                parameters.getKubeMQAddress());
+                parameters.getKubeMQAddress(),parameters.getAuthToken());
     }
 
     /**
@@ -75,19 +75,20 @@ public class Channel {
      * @param cacheTTL      Cache time to live : for how long does the request
      *                      should be saved in Cache
      * @param kubeMQAddress KubeMQ server address.
+     * @param authToken Represents JWT token to be used for KubeMQ authentication.
      */
     public Channel(RequestType requestsType, String channelName, String clientId, int timeout, String cacheKey,
-            int cacheTTL, String kubeMQAddress) {
+            int cacheTTL, String kubeMQAddress, String authToken) {
         this.requestType = requestsType;
         this.channelName = channelName;
         this.clientId = clientId;
         this.timeout = timeout;
         this.cacheKey = cacheKey;
         this.cacheTTL = cacheTTL;
-
+        
         isValid();
 
-        _initiator = new Initiator(kubeMQAddress);
+        _initiator = new Initiator(kubeMQAddress, authToken);
     }
 
     /**
@@ -176,16 +177,11 @@ public class Channel {
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
      * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
+     *                                           used for KubeMQ connection.   
      */
     public Response SendRequest(io.kubemq.sdk.commandquery.Request request)
-            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
-        try {
+            throws ServerAddressNotSuppliedException, SSLException {
             return _initiator.SendRequest(CreateLowLevelRequest(request));
-        } catch (io.grpc.StatusRuntimeException e) {
-            throw new AuthorizationException();
-        }
-
     }
 
     /**
@@ -204,12 +200,8 @@ public class Channel {
      *                                           used for KubeMQ connection.
      */
     public Response SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams)
-            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
-        try {
-            return _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams));
-        } catch (io.grpc.StatusRuntimeException e) {
-            throw new AuthorizationException();
-        }
+            throws ServerAddressNotSuppliedException, SSLException {     
+            return _initiator.SendRequest(CreateLowLevelRequest(request, overrideParams));       
     }
 
     /**

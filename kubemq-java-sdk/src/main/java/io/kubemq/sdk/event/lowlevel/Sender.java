@@ -23,7 +23,7 @@
  */
 package io.kubemq.sdk.event.lowlevel;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
+
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.Result;
@@ -78,18 +78,14 @@ public class Sender extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection. 
      */
-    public Result SendEvent(Event notification) throws ServerAddressNotSuppliedException, SSLException, AuthorizationException  {
+    public Result SendEvent(Event notification) throws ServerAddressNotSuppliedException, SSLException  {
         Kubemq.Event event = notification.ToInnerEvent();
-        try {
+       
             Kubemq.Result innerResult = GetKubeMQClient().sendEvent(event);
         if (innerResult == null) {
             return null;
         }
-            return new Result(innerResult);
-        } catch (io.grpc.StatusRuntimeException e) {
-            //TODO: handle exception
-            throw new AuthorizationException();
-        }
+         return new Result(innerResult);
     }
 
     /**
@@ -99,7 +95,7 @@ public class Sender extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
      * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.   
      */
-    public void StreamEventWithoutResponse(Event notification) throws ServerAddressNotSuppliedException, SSLException, AuthorizationException{
+    public void StreamEventWithoutResponse(Event notification) throws ServerAddressNotSuppliedException, SSLException{
         notification.setReturnResult(false);        
         GetKubeMQAsyncClient().sendEventsStream(null).onNext(notification.ToInnerEvent());
     }

@@ -37,7 +37,6 @@ import io.kubemq.sdk.queue.SendBatchMessageResult;
 import io.kubemq.sdk.queue.SendMessageResult;
 import io.kubemq.sdk.queue.Transaction;
 import io.kubemq.sdk.queue.TransactionMessagesResponse;
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.Exceptions.TransactionException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Request;
@@ -58,36 +57,36 @@ public class Program {
     public static void main(String[] args)
             throws ServerAddressNotSuppliedException, IOException, ClassNotFoundException, InterruptedException {
 
-        Ack_All_Messages_In_a_Queue();
-        Send_Message_to_a_Queue();
-        Send_Message_to_a_Queue_with_Expiration();
-        Send_Message_to_a_Queue_with_Delay();
-        Send_Message_to_a_Queue_with_DeadLetter_Queue();
-        Send_Batch_Messages();
-        Receive_Messages_from_a_Queue();
-        Peek_Messages_from_a_Queue();
-        Transactional_Queue_Ack_BAD();
-        Transactional_Queue_Ack();
-        Transactional_Queue_Reject();
-        Transactional_Queue_Extend_Visibility();
-        Transactional_Queue_Resend_to_New_Queue();
-        Transactional_Queue_Resend_Modified_Message();
+        // Ack_All_Messages_In_a_Queue();
+        // Send_Message_to_a_Queue();
+        // Send_Message_to_a_Queue_with_Expiration();
+        // Send_Message_to_a_Queue_with_Delay();
+        // Send_Message_to_a_Queue_with_DeadLetter_Queue();
+        // Send_Batch_Messages();
+        // Receive_Messages_from_a_Queue();
+        // Peek_Messages_from_a_Queue();
+        // Transactional_Queue_Ack_BAD();
+        // Transactional_Queue_Ack();
+        // Transactional_Queue_Reject();
+        // Transactional_Queue_Extend_Visibility();
+        // Transactional_Queue_Resend_to_New_Queue();
+        // Transactional_Queue_Resend_Modified_Message();
 
-        Receiving_Events();
-        Sending_Events_Single_Event();
-        Sending_Events_Stream_Events();
+        // Receiving_Events();
+        // Sending_Events_Single_Event();
+        // Sending_Events_Stream_Events();
 
-        Receiving_Events_Store();
-        Sending_Events_Store_Single_Event_to_Store();
-        Sending_Events_Store_Stream_Events_Store();
+        // Receiving_Events_Store();
+        // Sending_Events_Store_Single_Event_to_Store();
+        // Sending_Events_Store_Stream_Events_Store();
 
-        Commands_Receiving_Commands_Requests();
-        Commands_Sending_Command_Request();
-        Commands_Sending_Command_Request_async();
+        // Commands_Receiving_Commands_Requests();
+        // Commands_Sending_Command_Request();
+        // Commands_Sending_Command_Request_async();
 
-        Queries_Receiving_Query_Requests();
-        Queries_Sending_Query_Request();
-        Queries_Sending_Query_Request_async();
+        // Queries_Receiving_Query_Requests();
+        // Queries_Sending_Query_Request();
+        // Queries_Sending_Query_Request_async();
         Transactional_Queue_Reject_Loop();
 
         try {
@@ -99,10 +98,9 @@ public class Program {
     }
 
     private static void Transactional_Queue_Reject_Loop() throws SSLException, ServerAddressNotSuppliedException
-
     {
         int cnt = 0;
-        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000");
+        Queue queue = new Queue("QueueName", "ClientID", "localhost:50000","eyJhbGciOiJIUzI1NiJ9.e30.tNiB_q4Qk-ox-ZrEADaLi9gJpKZ9KJUSP16uqjHAdTE");
         while (true) {
             Transaction tran = queue.CreateTransaction();
             Transaction.ErrorObserver msgExpired = new Transaction.ErrorObserver() {
@@ -117,7 +115,7 @@ public class Program {
 
             try {
                 resRec = tran.Receive(1, 1, msgExpired);
-            } catch (TransactionException | AuthorizationException e) {
+            } catch (TransactionException  e) {
 
                 e.printStackTrace();
                 continue;
@@ -133,7 +131,7 @@ public class Program {
                         resRec.getMessage().getMessageID(), cnt);
                 try {
                     resRec = tran.ExtendVisibility(1);
-                } catch (TransactionException | AuthorizationException e) {
+                } catch (TransactionException  e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     continue;
@@ -147,7 +145,7 @@ public class Program {
 
                 try {
                     resRec = tran.RejectMessage();
-                } catch (TransactionException | AuthorizationException e) {
+                } catch (TransactionException  e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     continue;
@@ -171,7 +169,7 @@ public class Program {
 
         try {
             resRec = tran.Receive(1, 10);
-        } catch (TransactionException | AuthorizationException e) {
+        } catch (TransactionException  e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -188,7 +186,7 @@ public class Program {
             if (resSend.getIsError()) {
                 System.out.printf("Message enqueue error, error: %s", resSend.getError());
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException | IOException e) {
+        } catch ( ServerAddressNotSuppliedException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -208,7 +206,7 @@ public class Program {
             if (resSend.getIsError()) {
                 System.out.printf("Message enqueue error, error: %s", resSend.getError());
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException | IOException e) {
+        } catch ( ServerAddressNotSuppliedException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -225,7 +223,7 @@ public class Program {
             if (resSend.getIsError()) {
                 System.out.printf("Message enqueue error, error: %s", resSend.getError());
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException | IOException e) {
+        } catch ( ServerAddressNotSuppliedException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -245,7 +243,7 @@ public class Program {
             if (resSend.getIsError()) {
                 System.out.printf("Message enqueue error, error: %s", resSend.getError());
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException | IOException e) {
+        } catch ( ServerAddressNotSuppliedException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -277,7 +275,7 @@ public class Program {
                 }
 
             }
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException  | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -297,7 +295,7 @@ public class Program {
             for (Message msg : resRec.getMessages()) {
                 System.out.printf("MessageID: %s, Body:%s", msg.getMessageID(), Converter.FromByteArray(msg.getBody()));
             }
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException  | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -319,7 +317,7 @@ public class Program {
                 System.out.printf("MessageID: %s, Body: %s", msg.getMessageID(),
                         Converter.FromByteArray(msg.getBody()));
             }
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException  | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -337,7 +335,7 @@ public class Program {
                 return;
             }
             System.out.printf("Ack All Messages: %d completed", resAck.getAffectedMessages());
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException  | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -359,7 +357,7 @@ public class Program {
             System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
                     Converter.FromByteArray(resRec.getMessage().getBody()));
 
-        } catch (TransactionException | AuthorizationException | SSLException e) {
+        } catch (TransactionException  | SSLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -376,7 +374,7 @@ public class Program {
             if (resAck.getIsError()) {
                 System.out.printf("Ack message error: %s", resAck.getError());
             }
-        } catch (TransactionException | AuthorizationException | SSLException | ServerAddressNotSuppliedException e) {
+        } catch (TransactionException  | SSLException | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -401,7 +399,7 @@ public class Program {
             System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
                     Converter.FromByteArray(resRec.getMessage().getBody()));
 
-        } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -413,7 +411,7 @@ public class Program {
                 System.out.printf("Message dequeue error, error: %s", resRej.getError());
                 return;
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -434,7 +432,7 @@ public class Program {
             }
             System.out.printf("MessageID: %s, Body: %s", resRec.getMessage().getMessageID(),
                     Converter.FromByteArray(resRec.getMessage().getBody()));
-        } catch (TransactionException | AuthorizationException | SSLException | ServerAddressNotSuppliedException e) {
+        } catch (TransactionException | SSLException | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -450,7 +448,7 @@ public class Program {
                 System.out.printf("Message dequeue error, error: %s", resExt.getError());
                 return;
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -466,7 +464,7 @@ public class Program {
                 System.out.printf("Ack message error: %s", resAck.getError());
 
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -488,7 +486,7 @@ public class Program {
             }
             System.out.printf("MessageID: %s, Body:%s", resRec.getMessage().getMessageID(),
                     Converter.FromByteArray(resRec.getMessage().getBody()));
-        } catch (TransactionException | AuthorizationException | SSLException | ServerAddressNotSuppliedException e) {
+        } catch (TransactionException | SSLException | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -501,7 +499,7 @@ public class Program {
                 System.out.printf("Message Modify error, error::%s", resMod.getError());
                 return;
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -523,7 +521,7 @@ public class Program {
             System.out.printf("MessageID: %s, Body:%s", resRec.getMessage().getMessageID(),
                     Converter.FromByteArray(resRec.getMessage().getBody()));
 
-        } catch (TransactionException | AuthorizationException | SSLException | ServerAddressNotSuppliedException e) {
+        } catch (TransactionException | SSLException | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -536,7 +534,7 @@ public class Program {
                 System.out.printf("Message dequeue error, error: %s", resResend.getError());
                 return;
             }
-        } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -634,7 +632,7 @@ public class Program {
                 System.out.println("Could not send single message");
                 return;
             }
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException | ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -732,7 +730,7 @@ public class Program {
             event.setEventId("event-Store-" + i);
             try {
                 channel.SendEvent(event);
-            } catch (AuthorizationException | ServerAddressNotSuppliedException e) {
+            } catch (ServerAddressNotSuppliedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -768,7 +766,7 @@ public class Program {
 
                 try {
                     responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
-                } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+                } catch (SSLException |  ServerAddressNotSuppliedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
@@ -797,7 +795,7 @@ public class Program {
                 System.out.printf("Response error: %s", result.getError());
                 return;
             }
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException |  ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
@@ -807,7 +805,7 @@ public class Program {
     }
 
     private static void Commands_Sending_Command_Request_async() throws ServerAddressNotSuppliedException, IOException {
-        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
+        String ChannelName = "cmd", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
         io.kubemq.sdk.commandquery.ChannelParameters channelParameters = new io.kubemq.sdk.commandquery.ChannelParameters();
         channelParameters.setChannelName(ChannelName);
@@ -841,6 +839,7 @@ public class Program {
             }
         };
         channel.SendRequestAsync(request, response);
+        response.onCompleted();
 
     }
 
@@ -871,7 +870,7 @@ public class Program {
 
                 try {
                     responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
-                } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+                } catch (SSLException |  ServerAddressNotSuppliedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
@@ -904,7 +903,7 @@ public class Program {
                 return;
             }
             System.out.printf("Response Received: %s, ExecutedAt: %s", result.getRequestID(), result.getTimestamp());
-        } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+        } catch (SSLException |  ServerAddressNotSuppliedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

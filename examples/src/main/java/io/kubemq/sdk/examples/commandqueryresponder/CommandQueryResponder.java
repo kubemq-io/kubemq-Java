@@ -23,7 +23,6 @@
  */
 package io.kubemq.sdk.examples.commandqueryresponder;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Responder;
 import io.kubemq.sdk.commandquery.Response;
@@ -40,7 +39,7 @@ class CommandQueryResponder extends BaseExample {
     private Responder.RequestResponseObserver HandleIncomingRequests;
     private Responder responder;
 
-    CommandQueryResponder() throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
+    CommandQueryResponder() throws ServerAddressNotSuppliedException, SSLException {
         super("CommandQueryResponder");
         responder = new Responder();
         HandleIncomingRequests = request -> {
@@ -62,13 +61,12 @@ class CommandQueryResponder extends BaseExample {
     }
 
     private void CreateSubscribeToCommands()
-            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
+            throws ServerAddressNotSuppliedException, SSLException {
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.Queries);
         responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
     }
 
-    private void CreateSubscribeToQueries() throws ServerAddressNotSuppliedException, SSLException,
-        AuthorizationException {
+    private void CreateSubscribeToQueries() throws ServerAddressNotSuppliedException, SSLException {
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.Commands);
         responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
     }

@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import javax.naming.AuthenticationException;
 import javax.net.ssl.SSLException;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Responder;
 import io.kubemq.sdk.commandquery.Response;
@@ -65,7 +65,7 @@ public class Program {
 
                 try {
                     responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
-                } catch (SSLException | AuthorizationException | ServerAddressNotSuppliedException e) {
+                } catch (SSLException |  ServerAddressNotSuppliedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }

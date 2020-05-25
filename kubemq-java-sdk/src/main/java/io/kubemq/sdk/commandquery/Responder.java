@@ -23,7 +23,7 @@
  */
 package io.kubemq.sdk.commandquery;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
+
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
@@ -92,7 +92,7 @@ public class Responder extends GrpcClient {
      */
     public void SubscribeToRequests(SubscribeRequest subscribeRequest,
             final RequestResponseObserver requestResponseObserver)
-            throws ServerAddressNotSuppliedException, SSLException, AuthorizationException {
+            throws ServerAddressNotSuppliedException, SSLException {
 
         ValidateSubscribeRequest(subscribeRequest);
 
@@ -101,8 +101,7 @@ public class Responder extends GrpcClient {
         Iterator<Kubemq.Request> call = GetKubeMQClient().subscribeToRequests(innerSubscribeRequest);
 
         // await for requests form GRPC stream.
-        try {
-
+     
             while (call.hasNext()) {
                 // Received requests form GRPC stream.
                 Kubemq.Request innerRequest = call.next();
@@ -123,9 +122,7 @@ public class Responder extends GrpcClient {
                 // Send Response via GRPC
                 GetKubeMQClient().sendResponse(innerResponse);
             }
-        } catch (io.grpc.StatusRuntimeException e) {
-            throw new AuthorizationException();
-        }
+       
 
     }
 

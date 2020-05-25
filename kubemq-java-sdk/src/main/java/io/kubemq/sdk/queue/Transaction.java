@@ -27,7 +27,6 @@ import java.util.concurrent.Semaphore;
 import javax.net.ssl.SSLException;
 
 import io.grpc.stub.StreamObserver;
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.Exceptions.TransactionException;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
@@ -99,7 +98,7 @@ public class Transaction extends GrpcClient {
 
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds,
             ErrorObserver msgExpired)
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException,  ServerAddressNotSuppliedException, SSLException {
         errorObserver = msgExpired;
         if (state != TranState.Ready) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
@@ -133,7 +132,7 @@ public class Transaction extends GrpcClient {
      *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse Receive(Integer visibilitySeconds, Integer waitTimeSeconds)
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException,  ServerAddressNotSuppliedException, SSLException {
 
         if (state != TranState.Ready) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
@@ -165,7 +164,7 @@ public class Transaction extends GrpcClient {
      *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse AckMessage()
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException,  ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -194,7 +193,7 @@ public class Transaction extends GrpcClient {
      *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse RejectMessage()
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException,  ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -232,7 +231,7 @@ public class Transaction extends GrpcClient {
      *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse ExtendVisibility(int visibilitySeconds)
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException,  ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -265,7 +264,7 @@ public class Transaction extends GrpcClient {
      *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse ReSend(String queueName)
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException,  ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -295,7 +294,7 @@ public class Transaction extends GrpcClient {
      *                                           detected by an SSL subsystem.
      */
     public TransactionMessagesResponse Modify(Message message)
-            throws TransactionException, AuthorizationException, ServerAddressNotSuppliedException, SSLException {
+            throws TransactionException, ServerAddressNotSuppliedException, SSLException {
         if (msg == null) {
             return new TransactionMessagesResponse("No Active queue message, visibility expired:" + visibilityExp, null,
                     null);
@@ -389,7 +388,7 @@ public class Transaction extends GrpcClient {
     }
 
     private Kubemq.StreamQueueMessagesResponse StreamQueueMessage(Kubemq.StreamQueueMessagesRequest sr)
-            throws SSLException, ServerAddressNotSuppliedException, AuthorizationException
+            throws SSLException, ServerAddressNotSuppliedException, TransactionException
 
     {
 
@@ -409,7 +408,7 @@ public class Transaction extends GrpcClient {
                     lock.wait();
                     if (state != TranState.InTransaction) {
                         if (state == TranState.UNAUTHENTICATED) {
-                            throw new AuthorizationException();
+                           throw new TransactionException("UNAUTHENTICATED");
                         }
                         return latestMsg;
 
@@ -420,10 +419,11 @@ public class Transaction extends GrpcClient {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     return null;
-                } catch (AuthorizationException e) {
-                    e.printStackTrace();
-                    throw e;
-                }
+                } 
+                // catch (AuthorizationException e) {
+                //     e.printStackTrace();
+                //     throw e;
+                // }
 
                 finally {
 

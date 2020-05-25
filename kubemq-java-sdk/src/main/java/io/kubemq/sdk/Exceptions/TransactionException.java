@@ -12,5 +12,10 @@ public class TransactionException extends IOException {
     public TransactionException(){
         super("Transaction response is null");
     }
+
+
+    public TransactionException(String error){
+        super(error);
+    }
    
 }

@@ -23,7 +23,6 @@
  */
 package io.kubemq.sdk.examples.commandqueryinitiator;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.RequestType;
 import io.kubemq.sdk.commandquery.Response;
@@ -39,7 +38,7 @@ class CommandQueryInitiator extends BaseExample {
         SendLowLevelRequest();
     }
 
-    private void SendLowLevelRequest() throws SSLException, AuthorizationException, ServerAddressNotSuppliedException {
+    private void SendLowLevelRequest() throws SSLException, ServerAddressNotSuppliedException {
         Initiator initiator = new Initiator();
         Response response = initiator.SendRequest(CreateLowLevelRequest(RequestType.Query));
         initiator.SendRequest(CreateLowLevelRequest(RequestType.Command));

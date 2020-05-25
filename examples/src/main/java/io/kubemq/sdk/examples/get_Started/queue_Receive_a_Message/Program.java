@@ -30,7 +30,6 @@ import javax.net.ssl.SSLException;
 import io.kubemq.sdk.queue.Message;
 import io.kubemq.sdk.queue.Queue;
 import io.kubemq.sdk.queue.ReceiveMessagesResponse;
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.tools.Converter;
 
@@ -49,9 +48,7 @@ public class Program {
             queue.setWaitTimeSecondsQueueMessages(1);
             
         } catch (ServerAddressNotSuppliedException e) {
-            System.out.println("Error: Can not determine KubeMQ server address.");
-        } catch (AuthorizationException e) {
-            System.out.println("Error: KubeMQ is unreachable.");
+            System.out.println("Error: Can not determine KubeMQ server address.");      
         } catch (SSLException e) {
             System.out.println("Error: error detected by an SSL subsystem");
         }

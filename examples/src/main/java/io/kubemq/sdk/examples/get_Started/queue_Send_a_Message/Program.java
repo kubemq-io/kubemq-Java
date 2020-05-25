@@ -26,7 +26,6 @@ package io.kubemq.sdk.examples.get_Started.queue_Send_a_Message;
 import io.kubemq.sdk.queue.Message;
 import io.kubemq.sdk.queue.Queue;
 import io.kubemq.sdk.queue.SendMessageResult;
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.tools.Converter;
@@ -62,7 +61,7 @@ public class Program {
               } else{
                 System.out.println("message sent at, {res.SentAt}");
               }
-        } catch (SSLException | AuthorizationException e) {
+        } catch (SSLException  e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

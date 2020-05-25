@@ -54,6 +54,11 @@ public class ChannelParameters {
      * Represents The address of the KubeMQ server
      */
     private String kubeMQAddress;
+    /**
+     * Represents JWT token to be used for KubeMQ authentication.
+     */
+    private String authToken;
+
 
     /**
      * Initializes a new instance of the io.kubemq.sdk.commandquery.RequestChannelParameters class
@@ -72,8 +77,9 @@ public class ChannelParameters {
      * @param cacheKey      Cache time to live : for how long does the request should be saved in Cache
      * @param cacheTTL      Represents The address of the KubeMQ server
      * @param kubeMQAddress Represents The address of the KubeMQ server
+     * @param authToken Represents JWT token to be used for KubeMQ authentication.
      */
-    public ChannelParameters(RequestType requestType, String channelName, String clientID, int timeout, String cacheKey, int cacheTTL, String kubeMQAddress) {
+    public ChannelParameters(RequestType requestType, String channelName, String clientID, int timeout, String cacheKey, int cacheTTL, String kubeMQAddress, String authToken) {
         this.requestType = requestType;
         this.channelName = channelName;
         this.clientID = clientID;
@@ -81,6 +87,7 @@ public class ChannelParameters {
         this.cacheKey = cacheKey;
         this.cacheTTL = cacheTTL;
         this.kubeMQAddress = kubeMQAddress;
+        this.authToken = authToken;
     }
 
     public RequestType getRequestType() {
@@ -138,5 +145,14 @@ public class ChannelParameters {
     public void setKubeMQAddress(String kubeMQAddress) {
         this.kubeMQAddress = kubeMQAddress;
     }
+
+    public String getAuthToken(){
+        return this.authToken;
+    }
+
+    public void setAuthToken(String authToken){
+        this.authToken = authToken;
+    }
+  
 
 }

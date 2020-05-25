@@ -23,7 +23,6 @@
  */
 package io.kubemq.sdk.queue;
 
-import io.kubemq.sdk.Exceptions.AuthorizationException;
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 
@@ -108,20 +107,17 @@ public class Queue extends GrpcClient {
      *                                           determined.
      * @throws AuthorizationException   Authorization KubeMQ token to be used for KubeMQ connection. 
      */
-    public SendMessageResult SendQueueMessage(Message message) throws SSLException, ServerAddressNotSuppliedException, AuthorizationException {
+    public SendMessageResult SendQueueMessage(Message message) throws SSLException, ServerAddressNotSuppliedException {
         if (StringUtils.isEmpty(message.getQueue())) {
             message.setQueue(this.queueName);
         }
         if (StringUtils.isEmpty(message.getClientID())) {
             message.setClientID(this.clientID);
         }
-        try {
             Kubemq.SendQueueMessageResult rec = GetKubeMQClient().sendQueueMessage(message.toQueueMessage());
 
             return new SendMessageResult(rec);
-        } catch (io.grpc.StatusRuntimeException e) {
-            throw new AuthorizationException();
-        }
+       
       
 
     }
@@ -138,8 +134,8 @@ public class Queue extends GrpcClient {
      * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public SendBatchMessageResult SendQueueMessagesBatch(Iterable<Message> queueMessages)
-            throws SSLException, ServerAddressNotSuppliedException, AuthorizationException {
-        try {
+            throws SSLException, ServerAddressNotSuppliedException{
+    
             Kubemq.QueueMessagesBatchResponse rec = GetKubeMQClient()
             .sendQueueMessagesBatch(Kubemq.QueueMessagesBatchRequest.newBuilder().setBatchID(IDGenerator.Getid())
                     .addAllMessages(
@@ -147,11 +143,6 @@ public class Queue extends GrpcClient {
                     .build());
 
     return new SendBatchMessageResult(rec);
-        } catch (io.grpc.StatusRuntimeException e) {
-            //TODO: handle exception
-            throw new AuthorizationException();
-        }
-       
     }
 
     /**
@@ -166,10 +157,9 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws AuthorizationException         Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public ReceiveMessagesResponse ReceiveQueueMessages(Integer maxNumberOfMessagesQueueMessages,
-            Integer waitTimeSecondsQueueMessages) throws SSLException, ServerAddressNotSuppliedException, AuthorizationException {
+            Integer waitTimeSecondsQueueMessages) throws SSLException, ServerAddressNotSuppliedException {
 
         if (maxNumberOfMessagesQueueMessages == null) {
             maxNumberOfMessagesQueueMessages = this.maxNumberOfMessagesQueueMessages;
@@ -178,7 +168,7 @@ public class Queue extends GrpcClient {
             waitTimeSecondsQueueMessages = this.waitTimeSecondsQueueMessages;
         }
 
-        try {
+    
       
         Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient()
                 .receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder().setRequestID(IDGenerator.Getid())
@@ -187,9 +177,6 @@ public class Queue extends GrpcClient {
                         .setWaitTimeSeconds(this.waitTimeSecondsQueueMessages).build());
 
         return new ReceiveMessagesResponse(rec);
-    } catch (io.grpc.StatusRuntimeException e) {
-       throw new AuthorizationException();
-    }
     }
 
     /// <summary>
@@ -213,14 +200,14 @@ public class Queue extends GrpcClient {
      * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection.  
      */
     public ReceiveMessagesResponse PeekQueueMessage(Integer maxNumberOfMessagesQueueMessages,
-            Integer waitTimeSecondsQueueMessages) throws SSLException, ServerAddressNotSuppliedException, AuthorizationException {
+            Integer waitTimeSecondsQueueMessages) throws SSLException, ServerAddressNotSuppliedException {
         if (maxNumberOfMessagesQueueMessages == null) {
             maxNumberOfMessagesQueueMessages = this.maxNumberOfMessagesQueueMessages;
         }
         if (waitTimeSecondsQueueMessages == null) {
             waitTimeSecondsQueueMessages = this.waitTimeSecondsQueueMessages;
         }
-        try {
+      
             Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient()
             .receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder().setRequestID(IDGenerator.Getid())
                     .setClientID(this.clientID).setChannel(this.queueName)
@@ -228,9 +215,7 @@ public class Queue extends GrpcClient {
                     .setWaitTimeSeconds(waitTimeSecondsQueueMessages).setIsPeak(true).build());
 
     return new ReceiveMessagesResponse(rec);
-        } catch (io.grpc.StatusRuntimeException e) {
-            throw new AuthorizationException();
-        }
+      
       
     }
 
@@ -245,15 +230,13 @@ public class Queue extends GrpcClient {
      *                                           determined.
      * @throws AuthorizationException   Authorization KubeMQ token to be used for KubeMQ connection.
      */
-    public AckAllMessagesResponse AckAllQueueMessages() throws SSLException, ServerAddressNotSuppliedException, AuthorizationException  {
-       try {
+    public AckAllMessagesResponse AckAllQueueMessages() throws SSLException, ServerAddressNotSuppliedException  {
+    
         Kubemq.AckAllQueueMessagesResponse rec = GetKubeMQClient().ackAllQueueMessages(Kubemq.AckAllQueueMessagesRequest
         .newBuilder().setRequestID(IDGenerator.Getid()).setChannel(this.queueName).setClientID(this.clientID)
         .setWaitTimeSeconds(this.waitTimeSecondsQueueMessages).build());
         return new AckAllMessagesResponse(rec);
-       } catch (io.grpc.StatusRuntimeException e) {
-           throw new AuthorizationException();
-       }      
+         
     }
 
     /**
