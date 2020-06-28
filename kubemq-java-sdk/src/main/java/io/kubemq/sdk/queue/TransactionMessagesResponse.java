@@ -23,8 +23,8 @@
  */
 package io.kubemq.sdk.queue;
 
-import java.io.IOException;
 
+import io.kubemq.sdk.Exceptions.TransactionException;
 import io.kubemq.sdk.grpc.Kubemq;
 import io.kubemq.sdk.grpc.Kubemq.StreamQueueMessagesResponse;
 
@@ -36,9 +36,9 @@ public class TransactionMessagesResponse {
     private Message message;
 
 	protected TransactionMessagesResponse(Kubemq.StreamQueueMessagesResponse streamQueueMessagesResponse)
-            throws IOException {
+            throws TransactionException {
         if (streamQueueMessagesResponse == null){
-            throw new IOException("Could not recive message, inner error");
+            throw new TransactionException();
         }
 
         this.streamQueueMessagesResponse = streamQueueMessagesResponse;        

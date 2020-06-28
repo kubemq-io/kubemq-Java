@@ -40,7 +40,7 @@ class EventSubscriber extends BaseExample {
 
     EventSubscriber() throws ServerAddressNotSuppliedException, SSLException {
         super("EventSubscriber");
-        Subscriber subscriber = new Subscriber();
+         subscriber = new Subscriber();
         SubscribeToEventsWithoutStore();
         SubscribeToEventsWithStore();
 

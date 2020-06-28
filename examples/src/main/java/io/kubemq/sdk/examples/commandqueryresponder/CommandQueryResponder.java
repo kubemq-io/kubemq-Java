@@ -43,11 +43,8 @@ class CommandQueryResponder extends BaseExample {
         super("CommandQueryResponder");
         responder = new Responder();
         HandleIncomingRequests = request -> {
-            this.logger.warn(MessageFormat.format(
-                    "Subscriber Received Event: Metadata:''{0}'', Channel:''{1}''",
-                    request.getMetadata(),
-                    request.getChannel()
-            ));
+            this.logger.warn(MessageFormat.format("Subscriber Received Event: Metadata:''{0}'', Channel:''{1}''",
+                    request.getMetadata(), request.getChannel()));
 
             Response response = new Response(request);
             response.setCacheHit(false);
@@ -63,7 +60,8 @@ class CommandQueryResponder extends BaseExample {
         CreateSubscribeToCommands();
     }
 
-    private void CreateSubscribeToCommands() throws ServerAddressNotSuppliedException, SSLException {
+    private void CreateSubscribeToCommands()
+            throws ServerAddressNotSuppliedException, SSLException {
         SubscribeRequest subscribeRequest = CreateSubscribeRequest(SubscribeType.Queries);
         responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
     }

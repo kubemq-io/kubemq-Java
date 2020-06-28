@@ -27,7 +27,6 @@ import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 
 import io.kubemq.sdk.grpc.Kubemq;
-import io.kubemq.sdk.tools.Converter;
 import io.kubemq.sdk.tools.IDGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,39 +45,10 @@ public class Queue extends GrpcClient {
     private String queueName;
     private String clientID;
     private int maxNumberOfMessagesQueueMessages = 32;
-    private int waitTimeSecondsQueueMessages = 1;
-    private Transaction transaction;
+    private int waitTimeSecondsQueueMessages = 1;   
     private static Logger logger = LoggerFactory.getLogger(Queue.class);
 
-    /**
-     * Distributed durable FIFO based queues with the following core
-     * 
-     * @param queueName                        Represents The FIFO queue name to
-     *                                         send to using the KubeMQ.
-     * @param clientID                         Represents the sender ID that the
-     *                                         messages will be send under.
-     * @param maxNumberOfMessagesQueueMessages Number of received messages in
-     *                                         request.
-     * @param waitTimeSecondsQueueMessages     Wait time for received messages.
-     * @param kubeMQAddress                    The address the of the KubeMQ
-     *                                         including the GRPC Port ,Example:
-     *                                         "LocalHost:50000".
-     * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
-     *                                           determined.
-     */
-    public Queue(String queueName, String clientID, Integer maxNumberOfMessagesQueueMessages,
-            Integer waitTimeSecondsQueueMessages, String kubeMQAddress)
-            throws SSLException, ServerAddressNotSuppliedException {
-        this.queueName = queueName;
-        this.clientID = clientID;
-        this._kubemqAddress = kubeMQAddress;
-        this.maxNumberOfMessagesQueueMessages = maxNumberOfMessagesQueueMessages;
-        this.waitTimeSecondsQueueMessages = waitTimeSecondsQueueMessages;
-        this.Ping();
-    }
-
+       
     /**
      * Distributed durable FIFO based queues with the following core
      * 
@@ -102,6 +72,31 @@ public class Queue extends GrpcClient {
     }
 
     /**
+     * Distributed durable FIFO based queues with the following core
+     * 
+     * @param queueName     Represents The FIFO queue name to send to using the
+     *                      KubeMQ.
+     * @param clientID      Represents the sender ID that the messages will be send
+     *                      under.
+     * @param kubeMQAddress The address the of the KubeMQ including the GRPC Port
+     *                      ,Example: "LocalHost:50000".
+    * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection. 
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     */
+    public Queue(String queueName, String clientID, String kubeMQAddress, String authToken)
+            throws SSLException, ServerAddressNotSuppliedException {
+        this.queueName = queueName;
+        this.clientID = clientID;
+        this._kubemqAddress = kubeMQAddress;
+        this.addAuthToken(authToken);
+        this.Ping();
+    }
+
+    /**
      * Send single message
      * 
      * @param message Queue stored message
@@ -110,6 +105,7 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws AuthorizationException   Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public SendMessageResult SendQueueMessage(Message message) throws SSLException, ServerAddressNotSuppliedException {
         if (StringUtils.isEmpty(message.getQueue())) {
@@ -118,10 +114,11 @@ public class Queue extends GrpcClient {
         if (StringUtils.isEmpty(message.getClientID())) {
             message.setClientID(this.clientID);
         }
+            Kubemq.SendQueueMessageResult rec = GetKubeMQClient().sendQueueMessage(message.toQueueMessage());
 
-        Kubemq.SendQueueMessageResult rec = GetKubeMQClient().sendQueueMessage(message.toQueueMessage());
-
-        return new SendMessageResult(rec);
+            return new SendMessageResult(rec);
+       
+      
 
     }
 
@@ -134,17 +131,18 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public SendBatchMessageResult SendQueueMessagesBatch(Iterable<Message> queueMessages)
-            throws SSLException, ServerAddressNotSuppliedException {
+            throws SSLException, ServerAddressNotSuppliedException{
+    
+            Kubemq.QueueMessagesBatchResponse rec = GetKubeMQClient()
+            .sendQueueMessagesBatch(Kubemq.QueueMessagesBatchRequest.newBuilder().setBatchID(IDGenerator.Getid())
+                    .addAllMessages(
+                        toQueueMessages(queueMessages))
+                    .build());
 
-        Kubemq.QueueMessagesBatchResponse rec = GetKubeMQClient()
-                .sendQueueMessagesBatch(Kubemq.QueueMessagesBatchRequest.newBuilder().setBatchID(IDGenerator.Getid())
-                        .addAllMessages(
-                            toQueueMessages(queueMessages))
-                        .build());
-
-        return new SendBatchMessageResult(rec);
+    return new SendBatchMessageResult(rec);
     }
 
     /**
@@ -170,6 +168,8 @@ public class Queue extends GrpcClient {
             waitTimeSecondsQueueMessages = this.waitTimeSecondsQueueMessages;
         }
 
+    
+      
         Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient()
                 .receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder().setRequestID(IDGenerator.Getid())
                         .setClientID(this.clientID).setChannel(this.queueName)
@@ -197,6 +197,7 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection.  
      */
     public ReceiveMessagesResponse PeekQueueMessage(Integer maxNumberOfMessagesQueueMessages,
             Integer waitTimeSecondsQueueMessages) throws SSLException, ServerAddressNotSuppliedException {
@@ -206,13 +207,16 @@ public class Queue extends GrpcClient {
         if (waitTimeSecondsQueueMessages == null) {
             waitTimeSecondsQueueMessages = this.waitTimeSecondsQueueMessages;
         }
-        Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient()
-                .receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder().setRequestID(IDGenerator.Getid())
-                        .setClientID(this.clientID).setChannel(this.queueName)
-                        .setMaxNumberOfMessages(maxNumberOfMessagesQueueMessages)
-                        .setWaitTimeSeconds(waitTimeSecondsQueueMessages).setIsPeak(true).build());
+      
+            Kubemq.ReceiveQueueMessagesResponse rec = GetKubeMQClient()
+            .receiveQueueMessages(Kubemq.ReceiveQueueMessagesRequest.newBuilder().setRequestID(IDGenerator.Getid())
+                    .setClientID(this.clientID).setChannel(this.queueName)
+                    .setMaxNumberOfMessages(maxNumberOfMessagesQueueMessages)
+                    .setWaitTimeSeconds(waitTimeSecondsQueueMessages).setIsPeak(true).build());
 
-        return new ReceiveMessagesResponse(rec);
+    return new ReceiveMessagesResponse(rec);
+      
+      
     }
 
     /// Mark all the messages as dequeued on queue.
@@ -224,13 +228,15 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
+     * @throws AuthorizationException   Authorization KubeMQ token to be used for KubeMQ connection.
      */
-    public AckAllMessagesResponse AckAllQueueMessages() throws SSLException, ServerAddressNotSuppliedException {
+    public AckAllMessagesResponse AckAllQueueMessages() throws SSLException, ServerAddressNotSuppliedException  {
+    
         Kubemq.AckAllQueueMessagesResponse rec = GetKubeMQClient().ackAllQueueMessages(Kubemq.AckAllQueueMessagesRequest
-                .newBuilder().setRequestID(IDGenerator.Getid()).setChannel(this.queueName).setClientID(this.clientID)
-                .setWaitTimeSeconds(this.waitTimeSecondsQueueMessages).build());
-
+        .newBuilder().setRequestID(IDGenerator.Getid()).setChannel(this.queueName).setClientID(this.clientID)
+        .setWaitTimeSeconds(this.waitTimeSecondsQueueMessages).build());
         return new AckAllMessagesResponse(rec);
+         
     }
 
     /**
@@ -242,7 +248,7 @@ public class Queue extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      */
-    public Kubemq.PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+    public Kubemq.PingResult Ping() throws SSLException, ServerAddressNotSuppliedException{
         Kubemq.PingResult rec = GetKubeMQClient().ping(null);
         logger.debug("Queue KubeMQ address: '{}' ,ping result: '{}'", _kubemqAddress, rec);
         return rec;
@@ -276,8 +282,20 @@ public class Queue extends GrpcClient {
         return maxNumberOfMessagesQueueMessages;
     }
 
+
+
     /**
-     * Wait time for received messages, used as defult in peek and receive.
+     * Wait time for received messages, used as default in peek and receive.
+     * 
+     * @param maxNumberOfMessagesQueueMessages Number of returned messages, default
+     *                                         is 32
+     */
+    public void setMaxNumberOfMessagesQueueMessages(int maxNumberOfMessagesQueueMessages){
+        this.maxNumberOfMessagesQueueMessages = maxNumberOfMessagesQueueMessages;
+    }
+
+    /**
+     * Wait time for received messages, used as default in peek and receive.
      * 
      * @return Wait time in seconds.
      */
@@ -301,11 +319,9 @@ public class Queue extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      */
-    public Transaction CreateTransaction() throws ServerAddressNotSuppliedException {
-        if (transaction == null) {
-            transaction = new Transaction(this);
-        }
-        return transaction;
+    public Transaction CreateTransaction() throws ServerAddressNotSuppliedException {  
+     
+        return new Transaction(this);
     }
 
     private  Iterable<? extends Kubemq.QueueMessage> toQueueMessages(Iterable<Message> queueMessages) {

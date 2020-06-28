@@ -50,14 +50,21 @@ public class ChannelParameters {
      */
     private String kubeMQAddress;
 
+    /**
+     * KubeMQ JWT Auth token to be used for KubeMQ connection.
+     */
+    private String authToken;
+
+
     public ChannelParameters() {
     }
 
-    public ChannelParameters(String channelName, String clientID, boolean store, String kubeMQAddress) {
+    public ChannelParameters(String channelName, String clientID, boolean store, String kubeMQAddress, String authToken) {
         this.channelName = channelName;
         this.clientID = clientID;
         this.store = store;
         this.kubeMQAddress = kubeMQAddress;
+        this.authToken =authToken;
     }
 
     public String getChannelName() {
@@ -98,6 +105,14 @@ public class ChannelParameters {
 
     public void setKubeMQAddress(String kubeMQAddress) {
         this.kubeMQAddress = kubeMQAddress;
+    }
+
+    public String getAuthToken(){
+        return this.authToken;
+    }
+    
+    public void setAuthToken(String authToken){
+        this.authToken = authToken;
     }
 
 }

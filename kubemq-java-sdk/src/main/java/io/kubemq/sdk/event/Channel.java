@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.event;
 
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.lowlevel.Sender;
 import io.kubemq.sdk.grpc.Kubemq.PingResult;
@@ -43,20 +44,40 @@ public class Channel {
     private boolean store;
     private boolean returnResult;
 
-    public Channel(ChannelParameters parameters) {
-        this(
-                parameters.getChannelName(),
-                parameters.getClientID(),
-                parameters.isStore(),
-                parameters.getKubeMQAddress()
-        );
+    public Channel(ChannelParameters parameters) throws SSLException, ServerAddressNotSuppliedException {
+        this(parameters.getChannelName(), parameters.getClientID(), parameters.isStore(), parameters.getKubeMQAddress(),
+                parameters.getAuthToken());
     }
 
     /**
-     * Initializes a new instance of the MessageChannel class using a set of parameters.
+     * Initializes a new instance of the MessageChannel class using a set of
+     * parameters.
      *
      * @param channelName   Represents The channel name to send to using the KubeMQ.
-     * @param clientID      Represents the sender ID that the messages will be send under.
+     * @param clientID      Represents the sender ID that the messages will be send
+     *                      under.
+     * @param store         Represents if the messages should be set to persistence.
+     * @param kubeMQAddress Represents The address of the KubeMQ server.
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.
+     */
+    public Channel(String channelName, String clientID, boolean store, String kubeMQAddress, String authToken) {
+        this.channelName = channelName;
+        this.clientID = clientID;
+        this.store = store;
+
+        isValid();
+
+        sender = new Sender(kubeMQAddress, authToken);
+    }
+
+    /**
+     * Initializes a new instance of the MessageChannel class using a set of
+     * parameters.
+     *
+     * @param channelName   Represents The channel name to send to using the KubeMQ.
+     * @param clientID      Represents the sender ID that the messages will be send
+     *                      under.
      * @param store         Represents if the messages should be set to persistence.
      * @param kubeMQAddress Represents The address of the KubeMQ server.
      */
@@ -67,23 +88,25 @@ public class Channel {
 
         isValid();
 
-        sender = new Sender(kubeMQAddress);
+        sender = new Sender(kubeMQAddress, null);
     }
 
     /**
      * Send a single message using the KubeMQ.
      *
      * @param event The io.kubemq.sdk.pubsub.Event to send using KubeMQ.
-     * @return io.kubemq.sdk.event.MessageDeliveryReport that contain info regarding message status.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @return io.kubemq.sdk.event.MessageDeliveryReport that contain info regarding
+     *         message status.  
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws AuthorizationException    Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      */
-    public Result SendEvent(Event event) throws ServerAddressNotSuppliedException, SSLException {
+    public Result SendEvent(Event event)
+            throws SSLException,  ServerAddressNotSuppliedException {
         return sender.SendEvent(CreateLowLevelEvent(event));
-    }
-
-    public Result SendEvent(Event event, boolean returnResult) throws ServerAddressNotSuppliedException, SSLException {
-        return sender.SendEvent(CreateLowLevelEvent(event, returnResult));
     }
 
     /**
@@ -152,9 +175,9 @@ public class Channel {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
+     *                                           detected by an SSL subsystem.       
      */
-    public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
+    public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException  {
         return sender.Ping();
     }
 

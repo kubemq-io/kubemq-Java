@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.commandquery;
 
+
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.grpc.Kubemq;
@@ -56,9 +57,22 @@ public class Responder extends GrpcClient {
      * Initialize a new Responder to subscribe to Response.
      *
      * @param KubeMQAddress KubeMQ server address.
+     * 
      */
     public Responder(String KubeMQAddress) {
-        _kubemqAddress = KubeMQAddress;
+        this._kubemqAddress = KubeMQAddress;
+    }
+
+    /**
+     * Initialize a new Responder to subscribe to Response.
+     *
+     * @param KubeMQAddress KubeMQ server address.
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.
+     */
+    public Responder(String KubeMQAddress, String authToken) {
+        this._kubemqAddress = KubeMQAddress;
+        this.addAuthToken(authToken);
     }
 
     /**
@@ -73,6 +87,8 @@ public class Responder extends GrpcClient {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
+     * @throws AuthorizationException            Authorization KubeMQ token to be
+     *                                           used for KubeMQ connection.
      */
     public void SubscribeToRequests(SubscribeRequest subscribeRequest,
             final RequestResponseObserver requestResponseObserver)
@@ -80,33 +96,34 @@ public class Responder extends GrpcClient {
 
         ValidateSubscribeRequest(subscribeRequest);
 
-        this.Ping();
-
         Kubemq.Subscribe innerSubscribeRequest = subscribeRequest.ToInnerSubscribeRequest();
 
         Iterator<Kubemq.Request> call = GetKubeMQClient().subscribeToRequests(innerSubscribeRequest);
 
         // await for requests form GRPC stream.
-        while (call.hasNext()) {
-            // Received requests form GRPC stream.
-            Kubemq.Request innerRequest = call.next();
+     
+            while (call.hasNext()) {
+                // Received requests form GRPC stream.
+                Kubemq.Request innerRequest = call.next();
 
-            LogRequest(innerRequest);
+                LogRequest(innerRequest);
 
-            // Convert KubeMQ.Grpc.Request to RequestReceive
-            RequestReceive request = new RequestReceive(innerRequest);
+                // Convert KubeMQ.Grpc.Request to RequestReceive
+                RequestReceive request = new RequestReceive(innerRequest);
 
-            // Activate end-user request handler and receive the response
-            Response response = requestResponseObserver.onNext(request);
+                // Activate end-user request handler and receive the response
+                Response response = requestResponseObserver.onNext(request);
 
-            // Convert
-            Kubemq.Response innerResponse = response.Convert();
+                // Convert
+                Kubemq.Response innerResponse = response.Convert();
 
-            LogResponse(innerResponse);
+                LogResponse(innerResponse);
 
-            // Send Response via GRPC
-            GetKubeMQClient().sendResponse(innerResponse);
-        }
+                // Send Response via GRPC
+                GetKubeMQClient().sendResponse(innerResponse);
+            }
+       
+
     }
 
     /**

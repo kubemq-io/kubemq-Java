@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 
 import javax.net.ssl.SSLException;
 
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.Responder;
 import io.kubemq.sdk.commandquery.Response;
@@ -63,13 +64,11 @@ public class Program {
 
                 try {
                     responder.SubscribeToRequests(subscribeRequest, HandleIncomingRequests);
-                } catch (SSLException e) {
-                    System.out.printf("SSLException:%s", e.getMessage());
-                    e.printStackTrace();
-                } catch (ServerAddressNotSuppliedException e) {
-                    System.out.printf("ServerAddressNotSuppliedException:%s", e.getMessage());
+                } catch (SSLException |  ServerAddressNotSuppliedException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                  
             }
         }.start();
     }

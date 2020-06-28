@@ -41,9 +41,8 @@ public class Program {
             new EventChannel();
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");
-        } catch (io.grpc.StatusRuntimeException e) {
-            System.out.println("Error: KubeMQ is unreachable.");
-        } catch (SSLException e) {
+        } 
+        catch (SSLException e) {
             System.out.println("Error: error detected by an SSL subsystem");
         }
 

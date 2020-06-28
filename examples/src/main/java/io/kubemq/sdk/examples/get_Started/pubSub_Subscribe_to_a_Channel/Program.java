@@ -36,16 +36,17 @@ import io.kubemq.sdk.subscription.SubscribeType;
 import io.kubemq.sdk.tools.Converter;
 
 public class Program {
+    private final static Object lock = new Object();
+  
+    public static void main(String[] args) throws InterruptedException, IOException {
 
-    public static void main(String[] args)  {
-        
-        
-        String channelName = "testing_event_channel", clientID = "hello-world-subscriber", kubeMQAddress = "localhost:50000";
+        String channelName = "testing_event_channel", clientID = "hello-world-subscriber",
+                kubeMQAddress = "localhost:50000";
         Subscriber subscriber = new Subscriber(kubeMQAddress);
         SubscribeRequest subscribeRequest = new SubscribeRequest();
         subscribeRequest.setChannel(channelName);
         subscribeRequest.setClientID(clientID);
-        subscribeRequest.setSubscribeType(SubscribeType.Events); 
+        subscribeRequest.setSubscribeType(SubscribeType.Events);
 
         StreamObserver<EventReceive> streamObserver = new StreamObserver<EventReceive>() {
 
@@ -56,10 +57,10 @@ public class Program {
                             value.getEventId(), value.getChannel(), value.getMetadata(),
                             Converter.FromByteArray(value.getBody()));
                 } catch (ClassNotFoundException e) {
-                    System.out.printf("ClassNotFoundException: %s",e.getMessage());
+                    System.out.printf("ClassNotFoundException: %s", e.getMessage());
                     e.printStackTrace();
                 } catch (IOException e) {
-                    System.out.printf("IOException:  %s",e.getMessage());
+                    System.out.printf("IOException:  %s", e.getMessage());
                     e.printStackTrace();
                 }
 
@@ -67,23 +68,40 @@ public class Program {
 
             @Override
             public void onError(Throwable t) {
-                System.out.printf("Event Received Error: %s", t.toString());
+                System.out.printf("Event Received Error: %s", t.getMessage());
+                onCompleted();
             }
 
             @Override
             public void onCompleted() {
-
+                synchronized (lock) {
+                    lock.notify();
+                }
             }
         };
-        try {
-            subscriber.SubscribeToEvents(subscribeRequest, streamObserver);
-        } catch (SSLException e) {
-            System.out.printf("SSLException: %s", e.toString());
-            e.printStackTrace();
-        } catch (ServerAddressNotSuppliedException e) {
-            System.out.printf("ServerAddressNotSuppliedException: %s", e.toString());
-			e.printStackTrace();
-		}
+
        
+        try {
+            Subscribe(subscriber, subscribeRequest, streamObserver);
+        } catch (ServerAddressNotSuppliedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+      
+    }
+
+    
+
+    private static void Subscribe(Subscriber subscriber,SubscribeRequest subscribeRequest, StreamObserver<EventReceive> streamObserver)
+            throws InterruptedException, SSLException, ServerAddressNotSuppliedException {
+        synchronized (lock) {
+                   
+                subscriber.SubscribeToEvents(subscribeRequest, streamObserver);
+                lock.wait();
+                Subscribe(subscriber, subscribeRequest, streamObserver);
+           
+
+
+        }
     }
 }
