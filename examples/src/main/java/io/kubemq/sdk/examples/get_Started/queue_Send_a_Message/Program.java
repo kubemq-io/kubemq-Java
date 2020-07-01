@@ -35,35 +35,35 @@ import java.io.IOException;
 
 public class Program {
 
-    public static void main(String[] args) throws ServerAddressNotSuppliedException {
-        
-        
-        String queueName = "hello-world-queue", clientID = "test-queue-client-id2", kubeMQServerAddress = "localhost:50000";
+    public static void main(String[] args) throws ServerAddressNotSuppliedException, IOException {
+
+        String queueName = "hello-world-queue", clientID = "test-queue-client-id2",
+                kubeMQServerAddress = "localhost:50000";
 
         Queue queue = null;
-        try{
-            queue = new io.kubemq.sdk.queue.Queue(queueName,clientID,1,2,kubeMQServerAddress);
+        try {
+            queue = new io.kubemq.sdk.queue.Queue(queueName, clientID, kubeMQServerAddress);
+            queue.setMaxNumberOfMessagesQueueMessages(2);
+            queue.setWaitTimeSecondsQueueMessages(1);
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");
-        } catch (io.grpc.StatusRuntimeException e) {
-            System.out.println("Error: KubeMQ is unreachable.");
         } catch (SSLException e) {
             System.out.println("Error: error detected by an SSL subsystem");
         }
 
+        Message msg = new Message().setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
+                .setMetadata("empty");
+        SendMessageResult res;
         try {
-            
-            Message msg = new Message()
-            .setBody(Converter.ToByteArray("some-simple_queue-queue-message"))
-            .setMetadata("empty");
-            SendMessageResult res=  queue.SendQueueMessage(msg);
-          if(res.getIsError()  )       {
-            System.out.println("message enqueue error, error:{res.Error}");
-          } else{
-            System.out.println("message sent at, {res.SentAt}");
-          }
-        } catch (IOException e) {
-            System.out.println("Error:  I/O error occurred.");
+            res = queue.SendQueueMessage(msg);
+            if(res.getIsError()  )       {
+                System.out.println("message enqueue error, error:{res.Error}");
+              } else{
+                System.out.println("message sent at, {res.SentAt}");
+              }
+        } catch (SSLException  e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 }

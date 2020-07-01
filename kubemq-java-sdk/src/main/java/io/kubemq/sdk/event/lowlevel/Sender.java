@@ -23,6 +23,7 @@
  */
 package io.kubemq.sdk.event.lowlevel;
 
+
 import io.kubemq.sdk.basic.GrpcClient;
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.event.Result;
@@ -38,42 +39,53 @@ import javax.net.ssl.SSLException;
  */
 public class Sender extends GrpcClient {
 
-    private static Logger logger = LoggerFactory.getLogger(Sender.class);
+    private static Logger logger = LoggerFactory.getLogger(Sender.class);      
 
     /**
-     * Initialize a new Sender.
-     * KubeMQAddress will be parsed from Config or environment parameter.
+     * Initialize a new Sender. KubeMQAddress will be parsed from Config or
+     * environment parameter.
+     * 
+     * @throws ServerAddressNotSuppliedException
+     * @throws SSLException
      */
-    public Sender() {
-        this(null);
+    public Sender() throws SSLException, ServerAddressNotSuppliedException {
+        this(null,null);
     }
 
     /**
      * Initialize a new Sender under the requested KubeMQ Server Address.
      *
      * @param KubeMQAddress KubeMQ server address.
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.   
      */
-    public Sender(String KubeMQAddress) {
+    public Sender(String KubeMQAddress, String authToken) {
         this._kubemqAddress = KubeMQAddress;
+        this.addAuthToken(authToken);
     }
+
+    
 
     /**
      * Publish a single message using the KubeMQ.
      *
      * @param notification Event to add to the queue
-     * @return io.kubemq.sdk.event.MessageDeliveryReport that contain info regarding message status.
-     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @return io.kubemq.sdk.event.MessageDeliveryReport that contain info regarding
+     *         message status.
+     * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
+     *                                           determined.
+     * @throws SSLException                      Indicates some kind of error
+     *                                           detected by an SSL subsystem.
+     * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection. 
      */
-    public Result SendEvent(Event notification) throws ServerAddressNotSuppliedException, SSLException {
+    public Result SendEvent(Event notification) throws ServerAddressNotSuppliedException, SSLException  {
         Kubemq.Event event = notification.ToInnerEvent();
-        Kubemq.Result innerResult = GetKubeMQClient().sendEvent(event);
-
+       
+            Kubemq.Result innerResult = GetKubeMQClient().sendEvent(event);
         if (innerResult == null) {
             return null;
         }
-
-        return new Result(innerResult);
+         return new Result(innerResult);
     }
 
     /**
@@ -81,10 +93,10 @@ public class Sender extends GrpcClient {
      *
      * @param notification Event to add to the queue
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.   
      */
-    public void StreamEventWithoutResponse(Event notification) throws ServerAddressNotSuppliedException, SSLException {
-        notification.setReturnResult(false);
+    public void StreamEventWithoutResponse(Event notification) throws ServerAddressNotSuppliedException, SSLException{
+        notification.setReturnResult(false);        
         GetKubeMQAsyncClient().sendEventsStream(null).onNext(notification.ToInnerEvent());
     }
 
@@ -94,9 +106,9 @@ public class Sender extends GrpcClient {
      * @param messageDeliveryReportStreamObserver Observer for Delivery Reports.
      * @return StreamObserver used to stream messages
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be determined.
-     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.
+     * @throws SSLException                      Indicates some kind of error detected by an SSL subsystem.    
      */
-    public StreamObserver<Event> StreamEvent(final StreamObserver<Result> messageDeliveryReportStreamObserver) throws ServerAddressNotSuppliedException, SSLException {
+    public StreamObserver<Event> StreamEvent(final StreamObserver<Result> messageDeliveryReportStreamObserver) throws ServerAddressNotSuppliedException, SSLException  {
         StreamObserver<Kubemq.Event> streamObserver = GetKubeMQAsyncClient().sendEventsStream(new StreamObserver<Kubemq.Result>() {
             @Override
             public void onNext(Kubemq.Result value) {
@@ -158,7 +170,7 @@ public class Sender extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
+     *                                           detected by an SSL subsystem.     
      */
 	public io.kubemq.sdk.grpc.Kubemq.PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
 		return GetKubeMQClient().ping(null);

@@ -33,7 +33,7 @@ import javax.net.ssl.SSLException;
 
 class EventChannel extends BaseExample {
 
-    EventChannel() throws ServerAddressNotSuppliedException, SSLException {
+    EventChannel() throws SSLException, ServerAddressNotSuppliedException {
         super("EventChannel");
         ChannelParameters channelParameters = CreateMessageChannelParam();
         Channel channel = new Channel(channelParameters);

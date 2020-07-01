@@ -41,7 +41,7 @@ import java.util.Iterator;
 public class Subscriber extends GrpcClient {
 
     private static Logger logger = LoggerFactory.getLogger(Subscriber.class);
-
+ 
     /**
      * Initialize a new Subscriber to incoming messages KubeMQAddress will be parsed
      * from Config or environment parameter
@@ -57,6 +57,18 @@ public class Subscriber extends GrpcClient {
      */
     public Subscriber(String KubeMQAddress) {
         _kubemqAddress = KubeMQAddress;
+    }
+
+      /**
+     * Initialize a new Subscriber to incoming messages
+     *
+     * @param KubeMQAddress KubeMQ server address
+     * @param authToken     Set KubeMQ JWT Auth token to be used for KubeMQ
+     *                      connection.
+     */
+    public Subscriber(String KubeMQAddress, String authToken) {
+        _kubemqAddress = KubeMQAddress;
+        this.addAuthToken(authToken);
     }
 
     /**
@@ -97,7 +109,7 @@ public class Subscriber extends GrpcClient {
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
+     *                                           detected by an SSL subsystem.  
      */
     public PingResult Ping() throws SSLException, ServerAddressNotSuppliedException {
         return GetKubeMQClient().ping(null);
@@ -110,11 +122,11 @@ public class Subscriber extends GrpcClient {
      * @param subscribeRequest Parameters list represent by
      *                         io.kubemq.sdk.Subscription.SubscribeRequest that will
      *                         determine the subscription configuration.
-     * @param streamObserver   Async StreamObserver to handle queue messages
+     * @param streamObserver   Async StreamObserver to handle event messages
      * @throws ServerAddressNotSuppliedException Thrown exception when KubeMQ server
      *                                           address can not be determined.
      * @throws SSLException                      Indicates some kind of error
-     *                                           detected by an SSL subsystem.
+     *                                           detected by an SSL subsystem.   
      */
     public void SubscribeToEvents(
             SubscribeRequest subscribeRequest,
@@ -123,11 +135,8 @@ public class Subscriber extends GrpcClient {
 
         ValidateSubscribeRequest(subscribeRequest);
 
-       
         Kubemq.Subscribe innerSubscribeRequest = subscribeRequest.ToInnerSubscribeRequest();
-        this.Ping();
-        
-
+       
         StreamObserver<Kubemq.EventReceive> observer = new StreamObserver<Kubemq.EventReceive>() {
             @Override
             public void onNext(Kubemq.EventReceive messageReceive) {
@@ -145,8 +154,7 @@ public class Subscriber extends GrpcClient {
                 streamObserver.onCompleted();
             }
         };
-
-        GetKubeMQAsyncClient().subscribeToEvents(innerSubscribeRequest, observer);
+         GetKubeMQAsyncClient().subscribeToEvents(innerSubscribeRequest, observer);
     }
 
     private void ValidateSubscribeRequest(SubscribeRequest subscribeRequest) {

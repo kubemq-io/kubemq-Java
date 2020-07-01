@@ -15,8 +15,6 @@ public class Program {
 
         try {
             new CommandQueryResponderAsync();
-        } catch (io.grpc.StatusRuntimeException e) {
-            System.out.println("Error: KubeMQ is unreachable.");
         } catch (ServerAddressNotSuppliedException e) {
             System.out.println("Error: Can not determine KubeMQ server address.");
         } catch (SSLException e) {

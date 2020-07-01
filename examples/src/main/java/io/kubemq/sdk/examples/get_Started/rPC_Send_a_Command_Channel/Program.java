@@ -25,6 +25,7 @@ package io.kubemq.sdk.examples.get_Started.rPC_Send_a_Command_Channel;
 
 import java.io.IOException;
 
+
 import io.kubemq.sdk.basic.ServerAddressNotSuppliedException;
 import io.kubemq.sdk.commandquery.ChannelParameters;
 import io.kubemq.sdk.commandquery.Request;
@@ -36,7 +37,7 @@ public class Program {
 
     public static void main(String[] args) throws IOException {
 
-        String ChannelName = "testing_Command_channel", ClientID = "hello-world-sender",
+        String ChannelName = "cmd", ClientID = "hello-world-sender",
                 KubeMQServerAddress = "localhost:50000";
         ChannelParameters channelParameters = new ChannelParameters();
         channelParameters.setChannelName(ChannelName);
@@ -44,10 +45,12 @@ public class Program {
         channelParameters.setKubeMQAddress(KubeMQServerAddress);
         channelParameters.setRequestType(RequestType.Command);
         channelParameters.setTimeout(10000);
+          channelParameters.setAuthToken("eyJhbGciOiJIUzI1NiJ9.e30.tNiB_q4Qk-ox-ZrEADaLi9gJpKZ9KJUSP16uqjHAdTE");
         io.kubemq.sdk.commandquery.Channel channel = new io.kubemq.sdk.commandquery.Channel(channelParameters);
         Request request = new Request();
         request.setBody(Converter.ToByteArray("hello kubemq - sending a command, please reply"));
         Response result;
+        while(true){
         try {
             result = channel.SendRequest(request);
             if (!result.isExecuted()) {
@@ -58,7 +61,8 @@ public class Program {
         } catch (ServerAddressNotSuppliedException e) {
             System.out.printf("ServerAddressNotSuppliedException: %s", e.toString());
             e.printStackTrace();
-		}
+        }
+    }
         
     
     }

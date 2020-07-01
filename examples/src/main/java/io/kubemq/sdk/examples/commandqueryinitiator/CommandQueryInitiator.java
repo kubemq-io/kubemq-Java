@@ -38,7 +38,7 @@ class CommandQueryInitiator extends BaseExample {
         SendLowLevelRequest();
     }
 
-    private void SendLowLevelRequest() throws ServerAddressNotSuppliedException, SSLException {
+    private void SendLowLevelRequest() throws SSLException, ServerAddressNotSuppliedException {
         Initiator initiator = new Initiator();
         Response response = initiator.SendRequest(CreateLowLevelRequest(RequestType.Query));
         initiator.SendRequest(CreateLowLevelRequest(RequestType.Command));
