@@ -538,7 +538,7 @@ KubeMQ supports 6 types of subscriptions:
   }
 ```
 
-#### Strem Events Store
+#### Stream Events Store
 
 ```java
   String ChannelName = "testing_event_channel", ClientID = "hello-world-sender",
