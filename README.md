@@ -21,7 +21,7 @@ https://oss.sonatype.org/service/local/repositories/releases/content/io/kubemq/s
 To build with Gradle, add the dependency below to your build.gradle file.
 
 ``` java
-compile group: 'io.kubemq.sdk', name: 'kubemq-java-sdk', version: '1.0.1'
+compile group: 'io.kubemq.sdk', name: 'kubemq-sdk-Java', version: '1.0.1'
 ```
 
 ## Configurations
