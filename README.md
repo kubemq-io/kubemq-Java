@@ -2,6 +2,10 @@
 
 The **KubeMQ SDK for Java** enables Java developers to communicate with [KubeMQ](https://kubemq.io/) server.
 
+## Install KubeMQ Community Edition
+Please visit [KubeMQ Community](https://github.com/kubemq-io/kubemq-community) for intallation steps.
+
+
 ## General SDK description
 The SDK implements all communication patterns available through the KubeMQ server:
 - Events
