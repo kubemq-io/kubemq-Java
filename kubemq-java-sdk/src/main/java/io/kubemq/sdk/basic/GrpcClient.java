@@ -44,6 +44,7 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 public class GrpcClient {
 
     protected String _kubemqAddress;
+    protected Long _keepaliveSeconds;
     protected Metadata _metadata = null;
     protected String _authToken = null;
     private ManagedChannel channel = null;
@@ -144,18 +145,29 @@ public class GrpcClient {
     private ManagedChannel constructChannel() throws ServerAddressNotSuppliedException, SSLException {
         String kubemqAddress = getKubeMQAddress();
         String clientCertFile = ConfigurationLoader.GetCerificateFile();
+        Long keepAliveTime = getKubeMQKeepAliveInterval();
 
         Logger logger = getLogger();
         if (logger.isInfoEnabled()) {
             getLogger().info(MessageFormat.format("constructing channel to KubeMQ on {0}", kubemqAddress));
         }
 
+
         if (!StringUtils.isBlank(clientCertFile)) {
-            return NettyChannelBuilder.forTarget(kubemqAddress)
-                    .sslContext(GrpcSslContexts.forClient().trustManager(new File(clientCertFile)).build()).build();
+            NettyChannelBuilder channel = NettyChannelBuilder.forTarget(kubemqAddress)
+                    .sslContext(GrpcSslContexts.forClient().trustManager(new File(clientCertFile)).build());
+            if (keepAliveTime != null) {
+                return channel.keepAliveTime(keepAliveTime, TimeUnit.SECONDS).build();
+            } else {
+                return channel.build();
+            }
         } else {
-            // Open Insecure connection
-            return ManagedChannelBuilder.forTarget(kubemqAddress).usePlaintext().build();
+            ManagedChannelBuilder channel = ManagedChannelBuilder.forTarget(kubemqAddress).usePlaintext();
+            if (keepAliveTime != null) {
+                return channel.keepAliveTime(keepAliveTime, TimeUnit.SECONDS).build();
+            } else {
+                return channel.build();
+            }
         }
     }
 
@@ -197,6 +209,19 @@ public class GrpcClient {
         }
 
         return _kubemqAddress;
+    }
+
+    private Long getKubeMQKeepAliveInterval() {
+        // _keepaliveSeconds was supplied in the derived constructor
+        if (_keepaliveSeconds != null) {
+            return _keepaliveSeconds;
+        } else {
+            String kaSeconds = ConfigurationLoader.GetKeepAliveSeconds();
+            if (StringUtils.isBlank(kaSeconds)) {
+                return null;
+            }
+            return Long.parseLong(kaSeconds);
+        }
     }
 
     private void InitRegistration() {
