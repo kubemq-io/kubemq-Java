@@ -1,18 +1,20 @@
 plugins {
-    id 'java'
+    id "java"
 }
 
+group "io.kubemq.sdk"
+version "1.0.4"
 
-
-group 'io.kubemq.sdk'
-version '1.0.3'
-
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: "junit", name: "junit", version: "4.13.2"
+}
+
+ext {
+    grpcVersion = "1.51.1"
 }
