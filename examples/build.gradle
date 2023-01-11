@@ -1,92 +1,107 @@
 plugins {
-    id 'java'
+    id "java"
 }
 
-group 'io.kubemq.sdk'
-version '1.0.3'
+group "io.kubemq.sdk"
+version "1.0.4"
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    compile project(':kubemq-java-sdk')
+    testImplementation group: "junit", name: "junit", version: "4.13.2"
+    implementation group: "org.slf4j", name: "slf4j-api", version: "2.0.6"
+    implementation group: "ch.qos.logback", name: "logback-classic", version: "1.4.5"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation project(":kubemq-java-sdk")
 }
 
-apply plugin: 'idea'
+apply plugin: "idea"
 
-
-task("commandQueryChannel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.commandquerychannel.Program'
+tasks.register("commandQueryChannel", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.commandquerychannel.Program"
 }
 
-task("commandQueryInitiator", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.commandqueryinitiator.Program'
+tasks.register("commandQueryInitiator", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.commandqueryinitiator.Program"
 }
 
-task("commandQueryResponder", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.commandqueryresponder.Program'
+tasks.register("commandQueryResponder", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.commandqueryresponder.Program"
 }
 
-task("commandQueryResponderAsync", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.commandqueryresponderasync.Program'
+tasks.register("commandQueryResponderAsync", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.commandqueryresponderasync.Program"
 }
 
-task("eventChannel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.eventchannel.Program'
+tasks.register("eventChannel", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.eventchannel.Program"
 }
 
-task("eventSender", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.eventsender.Program'
+tasks.register("eventSender", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.eventsender.Program"
 }
 
-task("eventSubscriber", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.eventsubscriber.Program'
+tasks.register("eventSubscriber", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.eventsubscriber.Program"
 }
 
-task("siteDocUseCases", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.siteDocUseCases.Program'
+tasks.register("siteDocUseCases", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.siteDocUseCases.Program"
 }
 
-task("pubSub_Publish_to_a_Channel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.get_Started.pubSub_Publish_to_a_Channel.Program'
+tasks.register("pubSub_Publish_to_a_Channel", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.get_Started.pubSub_Publish_to_a_Channel.Program"
 }
 
-task("pubSub_Subscribe_to_a_Channel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.get_Started.pubSub_Subscribe_to_a_Channel.Program'
+tasks.register("pubSub_Subscribe_to_a_Channel", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.get_Started.pubSub_Subscribe_to_a_Channel.Program"
 }
 
-task("queue_Receive_a_Message", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.get_Started.queue_Receive_a_Message.Program'
+tasks.register("queue_Receive_a_Message", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.get_Started.queue_Receive_a_Message.Program"
 }
 
-task("queue_Send_a_Message", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.get_Started.queue_Send_a_Message.Program'
+tasks.register("queue_Send_a_Message", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.get_Started.queue_Send_a_Message.Program"
 }
 
-task("rPC_Send_a_Command_Channel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.get_Started.rPC_Send_a_Command_Channel.Program'
+tasks.register("rPC_Send_a_Command_Channel", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.get_Started.rPC_Send_a_Command_Channel.Program"
 }
 
-task("rPC_Subscribe_to_a_Channel", dependsOn: 'classes', type: JavaExec) {
-    main = 'io.kubemq.sdk.examples.get_Started.rPC_Subscribe_to_a_Channel.Program'
+tasks.register("rPC_Subscribe_to_a_Channel", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    dependsOn("classes")
+    mainClass = "io.kubemq.sdk.examples.get_Started.rPC_Subscribe_to_a_Channel.Program"
 }
