@@ -105,7 +105,6 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws AuthorizationException   Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public SendMessageResult SendQueueMessage(Message message) throws SSLException, ServerAddressNotSuppliedException {
         if (StringUtils.isEmpty(message.getQueue())) {
@@ -131,7 +130,6 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public SendBatchMessageResult SendQueueMessagesBatch(Iterable<Message> queueMessages)
             throws SSLException, ServerAddressNotSuppliedException{
@@ -197,7 +195,6 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection.  
      */
     public ReceiveMessagesResponse PeekQueueMessage(Integer maxNumberOfMessagesQueueMessages,
             Integer waitTimeSecondsQueueMessages) throws SSLException, ServerAddressNotSuppliedException {
@@ -228,7 +225,6 @@ public class Queue extends GrpcClient {
      *                                           detected by an SSL subsystem.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
-     * @throws AuthorizationException   Authorization KubeMQ token to be used for KubeMQ connection.
      */
     public AckAllMessagesResponse AckAllQueueMessages() throws SSLException, ServerAddressNotSuppliedException  {
     

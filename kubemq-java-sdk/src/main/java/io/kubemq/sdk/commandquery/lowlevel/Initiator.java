@@ -124,7 +124,6 @@ public class Initiator extends GrpcClient {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
-     * @throws InterruptedException
      */
     public Response SendRequest(Request request) throws SSLException, ServerAddressNotSuppliedException {
 

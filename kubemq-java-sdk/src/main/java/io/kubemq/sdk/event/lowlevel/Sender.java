@@ -76,7 +76,6 @@ public class Sender extends GrpcClient {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
-     * @throws AuthorizationException    Authorization KubeMQ token to be used for KubeMQ connection. 
      */
     public Result SendEvent(Event notification) throws ServerAddressNotSuppliedException, SSLException  {
         Kubemq.Event event = notification.ToInnerEvent();

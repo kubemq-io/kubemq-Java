@@ -176,8 +176,6 @@ public class Channel {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.   
      */
     public Response SendRequest(io.kubemq.sdk.commandquery.Request request)
             throws ServerAddressNotSuppliedException, SSLException {
@@ -196,8 +194,6 @@ public class Channel {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      */
     public Response SendRequest(io.kubemq.sdk.commandquery.Request request, RequestParameters overrideParams)
             throws ServerAddressNotSuppliedException, SSLException {     

@@ -87,8 +87,6 @@ public class Responder extends GrpcClient {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      */
     public void SubscribeToRequests(SubscribeRequest subscribeRequest,
             final RequestResponseObserver requestResponseObserver)

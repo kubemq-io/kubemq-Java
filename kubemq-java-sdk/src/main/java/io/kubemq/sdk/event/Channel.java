@@ -101,8 +101,6 @@ public class Channel {
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
      *                                           detected by an SSL subsystem.
-     * @throws AuthorizationException    Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      */
     public Result SendEvent(Event event)
             throws SSLException,  ServerAddressNotSuppliedException {

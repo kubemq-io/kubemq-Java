@@ -88,8 +88,6 @@ public class Transaction extends GrpcClient {
      * @return Transaction response
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
@@ -124,8 +122,6 @@ public class Transaction extends GrpcClient {
      * @return Transaction response
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
@@ -156,8 +152,6 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
@@ -185,8 +179,6 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
@@ -223,8 +215,6 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
@@ -256,8 +246,6 @@ public class Transaction extends GrpcClient {
      * 
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
@@ -286,8 +274,6 @@ public class Transaction extends GrpcClient {
      * @return Transaction response.
      * @throws TransactionException              Transaction return message is
      *                                           missing.
-     * @throws AuthorizationException            Authorization KubeMQ token to be
-     *                                           used for KubeMQ connection.
      * @throws ServerAddressNotSuppliedException KubeMQ server address can not be
      *                                           determined.
      * @throws SSLException                      Indicates some kind of error
