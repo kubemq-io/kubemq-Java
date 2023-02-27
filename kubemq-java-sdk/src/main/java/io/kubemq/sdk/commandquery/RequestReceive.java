@@ -82,7 +82,7 @@ public class RequestReceive {
 
 	private Map<String, String> tags;
 
-    RequestReceive(Kubemq.Request innerRequest) {
+    public RequestReceive(Kubemq.Request innerRequest) {
         setRequestId(innerRequest.getRequestID());
         setRequestType(RequestType.values()[(innerRequest.getRequestTypeDataValue())]);
         setClientID(innerRequest.getClientID());

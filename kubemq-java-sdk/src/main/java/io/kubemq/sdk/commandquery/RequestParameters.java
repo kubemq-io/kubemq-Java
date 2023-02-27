@@ -43,7 +43,7 @@ public class RequestParameters {
     /**
      * Initializes a new instance of the RequestParameters
      */
-    RequestParameters() {
+    public RequestParameters() {
     }
 
     /**
@@ -54,7 +54,7 @@ public class RequestParameters {
      * @param cacheKey Represents if the request should be saved from Cache and under what "Key"(String) to save it
      * @param cacheTTL Cache time to live : for how long does the request should be saved in Cache
      */
-    RequestParameters(int timeout, String cacheKey, int cacheTTL) {
+    public RequestParameters(int timeout, String cacheKey, int cacheTTL) {
         setTimeout(timeout);
         setCacheKey(cacheKey);
         setCacheTTL(cacheTTL);

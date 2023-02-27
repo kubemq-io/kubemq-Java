@@ -30,7 +30,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.kubemq.sdk</groupId>
   <artifactId>kubemq-sdk-Java</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <build>
     <plugins>
       <plugin>
