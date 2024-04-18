@@ -56,7 +56,7 @@ publishing {
         mavenJava(MavenPublication){
             groupId = 'io.kubemq.sdk'
             artifactId = 'kubemq-sdk-Java'
-            version = '1.0.5'
+            version = '1.0.6'
             from components.java
 
             pom {
