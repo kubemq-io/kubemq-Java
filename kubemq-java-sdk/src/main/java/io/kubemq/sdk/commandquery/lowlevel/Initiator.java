@@ -100,15 +100,6 @@ public class Initiator extends GrpcClient {
             @Override
             public void onCompleted() {
                 responseStreamObserver.onCompleted();
-                try {
-                    shutdown();
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    shutdownNow();
-                    // Preserve interrupt status
-                    Thread.currentThread().interrupt();
-                }
             }
         });
     }
