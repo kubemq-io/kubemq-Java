@@ -124,7 +124,7 @@ public class GrpcClient {
     }
 
     public void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(5, TimeUnit.NANOSECONDS);
+        channel.shutdown().awaitTermination(5, TimeUnit.MICROSECONDS);
     }
 
     public void shutdownNow() {
