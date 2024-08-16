@@ -1,3 +1,5 @@
+This repository is no longer active
+The new Java SDK is here [https://github.com/kubemq-io/kubemq-java-v2](https://github.com/kubemq-io/kubemq-java-v2)
 # Java
 
 The **KubeMQ SDK for Java** enables Java developers to communicate with [KubeMQ](https://kubemq.io/) server.
